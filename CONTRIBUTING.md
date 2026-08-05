@@ -5,7 +5,9 @@
 1. Create a folder with a short `kebab-case` name.
 2. Add subdirectories: `archetypes/`, `templates/`, `examples/`, `scripts/`, `references/`.
 3. Copy `shared/SKILL-template.md` to `<folder>/SKILL.md` and fill in every section.
-4. Place shared rules in `shared/` rather than duplicating them.
+4. Add YAML frontmatter to the top of `SKILL.md` — `name` must exactly match the folder name,
+   or the skill silently fails to load. See [AGENTS.md](AGENTS.md#authoring-rules).
+5. Place shared rules in `shared/` rather than duplicating them.
 
 ## Editing Existing Files
 

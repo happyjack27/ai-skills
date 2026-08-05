@@ -1,3 +1,8 @@
+---
+name: research
+description: 'Use when investigating an unfamiliar topic, product, or API: structuring a search, evaluating source quality, comparing options, and summarizing findings with citations.'
+---
+
 # Research Skill
 
 > **TODO:** Fill in this file using `shared/SKILL-template.md` as a guide.

@@ -35,6 +35,7 @@ ai-skills/
 ├── investing/
 ├── accela/          # Accela Civic Platform
 ├── aurora/          # Aurora platform
+├── dpw-migration/   # DPW Oracle (DPWP) to SQL Server migration
 ├── personal/        # Personal workflows and preferences
 └── tools/           # Dev tools, IDEs, CLIs
 ```
@@ -52,10 +53,16 @@ Each skill folder contains:
 
 ## How AI Agents Should Use This Repository
 
-1. Read `shared/` files first to understand baseline standards.
-2. Navigate to the relevant skill folder and read `SKILL.md`.
-3. Pull in templates or archetypes as needed.
-4. Follow the Workflow and Quality Standards sections before producing output.
+See [AGENTS.md](AGENTS.md) for the full protocol. In short:
+
+1. Match the task to one or two skills using the index in `AGENTS.md`.
+2. Read that skill's `SKILL.md`.
+3. Open `references/`, `templates/`, or `examples/` only when `SKILL.md` points there.
+4. Read `shared/` only when a skill links to it.
+
+Mount the whole repo once at your agent's skill directory (e.g. `~/.copilot/skills`,
+`~/.claude/skills`) so every folder is available and new ones appear automatically — see
+[Mounting](AGENTS.md#mounting).
 
 ## Naming Conventions
 

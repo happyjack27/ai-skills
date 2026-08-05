@@ -1,3 +1,8 @@
+---
+name: writing
+description: 'Use for prose that is not code documentation: emails, status updates, proposals, user-facing notices, and editing existing text for tone, clarity, and concision.'
+---
+
 # Writing Skill
 
 > **TODO:** Fill in this file using `shared/SKILL-template.md` as a guide.

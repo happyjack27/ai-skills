@@ -1,3 +1,8 @@
+---
+name: sql
+description: 'Use for writing, optimizing, or explaining SQL: queries, DDL/schema changes, stored procedures, views, indexes, and execution-plan/performance review across SQL Server (T-SQL), PostgreSQL, MySQL, SQLite, and Oracle.'
+---
+
 # SQL Skill
 
 ## Purpose

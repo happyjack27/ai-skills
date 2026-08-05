@@ -1,3 +1,8 @@
+---
+name: personal
+description: 'Use for this user''s personal working preferences, recurring workflows, environment quirks, and standing conventions that should shape how tasks are carried out.'
+---
+
 # Personal Skill
 
 > **TODO:** Fill in this file using `shared/SKILL-template.md` as a guide.

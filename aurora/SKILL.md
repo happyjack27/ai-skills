@@ -1,3 +1,8 @@
+---
+name: aurora
+description: 'Use for Aurora platform work: configuration, data model, integrations, and troubleshooting.'
+---
+
 # Aurora Skill
 
 > **TODO:** Fill in this file using `shared/SKILL-template.md` as a guide.

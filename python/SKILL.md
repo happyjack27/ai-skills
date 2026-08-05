@@ -1,3 +1,8 @@
+---
+name: python
+description: 'Use for Python development: scripting, virtual environments and packaging, data work with pandas, database access, testing with pytest, type hints, and debugging.'
+---
+
 # Python Skill
 
 > **TODO:** Fill in this file using `shared/SKILL-template.md` as a guide.

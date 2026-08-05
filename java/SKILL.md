@@ -1,3 +1,8 @@
+---
+name: java
+description: 'Use for Java development: JDBC and connection handling, RMI servers and remote interfaces, servlets and JSP, collections and generics, exception handling, build/classpath issues, and modernizing legacy Java code.'
+---
+
 # Java Skill
 
 > **TODO:** Fill in this file using `shared/SKILL-template.md` as a guide.

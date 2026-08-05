@@ -1,3 +1,8 @@
+---
+name: tools
+description: 'Use for developer tooling and environment setup: VS Code and Eclipse configuration, CLI utilities, extensions, editor settings, and AI-assistant customization files.'
+---
+
 # Tools Skill
 
 > **TODO:** Fill in this file using `shared/SKILL-template.md` as a guide.

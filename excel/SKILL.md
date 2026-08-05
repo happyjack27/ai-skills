@@ -1,3 +1,8 @@
+---
+name: excel
+description: 'Use for Microsoft Excel tasks: writing worksheet formulas, VBA macros, Power Query (M) transformations, pivot tables, and automating repetitive Excel workflows on Windows/Mac/Excel Online.'
+---
+
 # Excel Skill
 
 ## Purpose

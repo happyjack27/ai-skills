@@ -1,3 +1,8 @@
+---
+name: documentation
+description: 'Use for writing technical documentation: READMEs, runbooks, API references, architecture notes, code comments, changelogs, and diagrams (Mermaid).'
+---
+
 # Documentation Skill
 
 > **TODO:** Fill in this file using `shared/SKILL-template.md` as a guide.

@@ -1,3 +1,8 @@
+---
+name: linux
+description: 'Use for Linux administration and shell work: bash scripting, systemd services, cron, file permissions, process and disk troubleshooting, networking commands, and package management.'
+---
+
 # Linux Skill
 
 > **TODO:** Fill in this file using `shared/SKILL-template.md` as a guide.

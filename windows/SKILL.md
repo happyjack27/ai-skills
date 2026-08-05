@@ -1,3 +1,8 @@
+---
+name: windows
+description: 'Use for Windows administration: services, scheduled tasks, registry, IIS, Active Directory, file shares and permissions, event logs, and command-line troubleshooting.'
+---
+
 # Windows Skill
 
 > **TODO:** Fill in this file using `shared/SKILL-template.md` as a guide.

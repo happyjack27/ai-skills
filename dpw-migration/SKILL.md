@@ -58,6 +58,13 @@ Reference files:
   for "what tables go in this database?", "which apps use it?", and "who are its main users?".
 - [`references/servlet-routing.md`](references/servlet-routing.md) — how each servlet page picks
   its database, backend, and environment. Read before flipping any page to SQL Server.
+- [`references/rmi-routing.md`](references/rmi-routing.md) — the RMI-server side (`GenericServer`/
+  `RoutingChecker`/`DPWConnectionFactory`): the routing priority chain, the "subject-table-keyed
+  dictionary table" gotcha, and how to tell a bad routing decision from a bad connection/login.
+- [`references/query-error-triage.md`](references/query-error-triage.md) — triaging
+  `CheckerQueryLog`/`vCheckerQuerySummary` for live vs. stale errors, the Oracle `||`-to-T-SQL-`+`
+  numeric-cast gotcha, the "fix committed but not redeployed" pattern, and how to record a query
+  group's resolution (`fixed`/`pending_deploy`/`wont_fix`/`benign`) in `CheckerQueryFix`.
 
 The essentials:
 
@@ -142,6 +149,14 @@ Three separate switches must agree; see
   the transition. Check `migration.DbObjectTargetDatabases`.
 - **An invalid Oracle package blocks every table carrying its trigger.** After touching
   `BLOCK_PKG`, re-check `USER_OBJECTS` for `STATUS <> 'VALID'`.
+- **A "dictionary" table's own migration status is the wrong thing to check.** Tables like
+  `DATA_DICTIONARY_COLUMNS` describe *another* table via a `table_name` column/parameter, not
+  themselves — route by that bound subject table's own mapping, not the dictionary table's.
+  Getting this wrong looks like a legitimate fallback (dictionary table shows "pending") but is
+  actually a routing gap. See [`references/rmi-routing.md`](references/rmi-routing.md).
+- **A wrong routing decision and a failed connection to the resolved DB are different failures.**
+  `migration.RoutingFallbackLog` only records the routing decision, never whether the connection
+  actually succeeded — check the target server's `xp_readerrorlog` for login failures separately.
 
 ## Validation Checklist
 

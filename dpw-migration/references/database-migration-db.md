@@ -76,8 +76,10 @@ through one of them.
 **Query analysis and runtime logs**
 
 `SqlQueryInventory` (175), `CheckerQueryLog` (115 043 — captured runtime queries),
-`CheckerQueryFix` (10), `vCheckerQuerySummary`, `RoutingFallbackLog` (61 — routing that fell
-through to `DPWP`, worth reviewing), `GenericCallUpdates` (2 200).
+`CheckerQueryFix` (resolution tracking — `resolution_type` of `fixed`/`pending_deploy`/`wont_fix`/
+`benign`, see [`query-error-triage.md`](query-error-triage.md)), `vCheckerQuerySummary`,
+`RoutingFallbackLog` (61 — routing that fell through to `DPWP`, worth reviewing),
+`GenericCallUpdates` (2 200).
 
 **Empty / unused:** `Clusters`, `ClusterMembership`, `ConversionPlan`, `ServerCallsInventory`,
 `AppOverlapPairs`.

@@ -28,6 +28,22 @@ Load progressively. Never read the whole repo.
 Read `shared/` only when a skill explicitly links to it, or when the task is about repo-wide
 standards. It is not a mandatory preamble.
 
+## Feed Learnings Back Into Skills
+
+If a task required heavy lifting — extended research, trial and error, a mistake that had to be
+fixed, or a workaround for a gotcha that wasn't already documented — capture that as a skill
+update before finishing:
+
+- **A matching skill exists** — add the new fact, gotcha, or corrected approach to it (or its
+  `references/`) so the next occurrence is a lookup, not a rediscovery.
+- **No skill matches** — create one, or add a section to the closest existing skill, following
+  [Authoring Rules](#authoring-rules).
+- Write it the way you wish it had been written before you started: the failure mode, the fix,
+  and any command/query that proves it. Skip anything that was already obvious or already
+  documented.
+- Do this for genuine repeatable lessons, not one-off trivia. If it's specific to one user's
+  environment or a single conversation, it belongs in that agent's own memory system instead.
+
 ## Skill Index
 
 | Skill | Use for |
@@ -47,7 +63,9 @@ standards. It is not a mandatory preamble.
 | `powershell` | Cmdlets and pipelines, remoting, running SQL/external tools, admin automation |
 | `python` | Scripting, venvs/packaging, pandas, pytest, type hints |
 | `research` | Investigating unfamiliar topics; source quality; comparing options |
+| `skill-creator` | Creating or updating skills in this library (SKILL.md structure, frontmatter, folders) |
 | `sql` | Queries, DDL, procs, views, indexes, tuning (T-SQL, PG, MySQL, SQLite, Oracle) |
+| `tfs-boards` | tfs.milwaukee.gov "Internal Systems Projects" board: WIQL queries, work item CRUD, board columns |
 | `tools` | VS Code/Eclipse config, CLIs, extensions, AI-assistant customization files |
 | `web` | HTML/CSS, REST design, HTTP semantics, auth flows, browser debugging |
 | `windows` | Services, scheduled tasks, registry, IIS, AD, shares, event logs |

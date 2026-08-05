@@ -42,6 +42,13 @@ When a prefix's meaning is genuinely unclear for a task, don't guess — open a 
 record type you already understand and read what state (`wfTask`, `wfStatus`, inspection result
 variables, `balanceDue`, etc.) it relies on; that tells you which event it must be.
 
+**Recording an inspection result almost always also moves the workflow forward** — closing the
+current task, scheduling the next one, or closing the whole record — not just logging a value.
+When analyzing what an `IRSA` script does (or should do) for a given result, assume it has a
+workflow-side effect (`activateTask(...)`, `closeTaskProcessCRM(...)`, scheduling a follow-up task,
+etc.) until you've actually confirmed it's a no-op result, rather than treating the inspection
+result and the workflow transition as two separate, possibly-unrelated things to analyze.
+
 ## Shared Includes
 
 - `INCLUDES_CUSTOM.js` / `INCLUDES_CUSTOM/*.js` — shared helper functions (`eventMatch`,

@@ -174,15 +174,31 @@ group" — it answers "what sections show up on the record" instead.
   Yards", ...)` calls work in production scripts, so the field exists somewhere and is configured
   through Accela Admin — just don't have the backing reference table confirmed. If you find it,
   correct this note.
+- **A 0-row result on `BAPPSPECTABLE` for a given `COLUMN_NAME` does not necessarily mean the field
+  doesn't exist or that something's wrong.** `BAPPSPECTABLE` only holds a row once that field has
+  actually been *saved with a value* on at least one real record — a field can be fully configured
+  in Accela Admin and referenced correctly by a script (`editAppSpecific("Cubic Yards", ...)`) and
+  still have zero rows here simply because that code path has never run in production yet. Don't
+  treat this the same as the `R1_FEE_CODE`/`R1_GF_COD` case above (a genuine documentation bug that
+  caused a wrong-column exact match) — confirm which situation you're in by checking whether the
+  *script* referencing the field is live/reachable before concluding the field itself is missing.
 
 ## Fees — `RFEE_SCHEDULE`, `RFEEITEM`, `XAPPTYP_FEESCHEDULE`
 
-⚠️ **Corrected 2026-08-05** — `RFEEITEM` does not have `FEE_CODE`/`FEE_DESC` columns. Real column
-names (verified via `INFORMATION_SCHEMA.COLUMNS`): `R1_FEE_CODE` (the fee code, e.g. `PWDC005`),
-`R1_GF_DES` (description), `R1_FEE_CODE_STATUS` and `REC_STATUS` (both exist — check both),
-`R1_GF_FIX` (flat fee amount), `R1_GF_AUTO_INVOICED_FLAG`, `R1_GF_AUTO_ASSESS_FLAG`,
-`R1_EFFECT_DATE`/`R1_EXPIRE_DATE`.
+⚠️ **Corrected 2026-08-05, then corrected AGAIN 2026-08-05** — the column *names* in the first
+correction were right, but the two codes' roles were documented backwards. Verified directly this
+time (`SELECT ... WHERE R1_FEE_CODE = 'PW_SAN_COMP_CC'` returns the full `PWDC*`/`PWCC*` item list):
 
+- **`R1_FEE_CODE`** = the fee **schedule/group** code (e.g. `PW_SAN_COMP_CC`) — this is the 2nd
+  argument to the EMSE `addFee(feeCode, groupCode, ...)` call, confusingly.
+- **`R1_GF_COD`** = the individual **fee item** code (e.g. `PWDC007`) — this is `addFee`'s 1st
+  argument. `R1_GF_DES` is that item's description (e.g. `Late Fee`), `R1_GF_FIX` its flat amount.
+- An exact filter like `WHERE R1_FEE_CODE IN ('PWDC004','PWDC007')` will silently return **0 rows**
+  — those are `R1_GF_COD` values, not `R1_FEE_CODE` values. This is exactly the mistake that looked
+  like a data anomaly earlier; it wasn't one, the column roles were just swapped in this doc.
+- `R1_FEE_CODE_STATUS` and `REC_STATUS` both exist on the row — check both before assuming a fee
+  item is active. `R1_GF_AUTO_INVOICED_FLAG`, `R1_GF_AUTO_ASSESS_FLAG`, `R1_EFFECT_DATE`/
+  `R1_EXPIRE_DATE` round out the row.
 - `RFEEITEM` — the fee item catalog, `RFEEITEM_GROUP` for grouping.
 - `RFEE_SCHEDULE` — named fee schedules; `XAPPTYP_FEESCHEDULE` cross-references a record type to
   its schedule(s).
@@ -190,9 +206,11 @@ names (verified via `INFORMATION_SCHEMA.COLUMNS`): `R1_FEE_CODE` (the fee code, 
   can just be invoiced — adding/activating a fee item is Admin config, not a script change.
 
 ```sql
-SELECT R1_FEE_CODE, R1_GF_DES, R1_FEE_CODE_STATUS, REC_STATUS, R1_GF_FIX, R1_GF_AUTO_INVOICED_FLAG
+-- List every fee item in a schedule (filter on R1_FEE_CODE = the SCHEDULE code, not the item code)
+SELECT DISTINCT R1_GF_COD, R1_GF_DES, R1_GF_FIX, REC_STATUS, R1_FEE_CODE_STATUS
 FROM RFEEITEM
-WHERE SERV_PROV_CODE = 'MILWAUKEE' AND R1_FEE_CODE IN ('PWDC004','PWDC007','PWDC008');
+WHERE R1_FEE_CODE = 'PW_SAN_COMP_CC'
+ORDER BY R1_GF_COD;
 ```
 
 ## EMSE Script Registration — `REVT_EVENT`, `REVT_MASTER_SCRIPT`, `XEXPRESSION_EMSE_SCRIPT`

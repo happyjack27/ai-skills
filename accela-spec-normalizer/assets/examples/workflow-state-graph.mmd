@@ -1,0 +1,15 @@
+stateDiagram-v2
+  state "Child record" as Child
+  [*] --> Inspection
+  Inspection --> Closed: No violation, duplicate, void
+  Inspection --> Reinspection: 1-4 or 4+ cy, 5 cal days
+  Inspection --> Reinspection: Immediate, next bus day
+  Inspection --> Child: Refer to DNS, city property
+  Reinspection --> Payment: Collected
+  Reinspection --> Closed: Done by owner
+  Reinspection --> Closed: Not collected
+  Payment --> Closed: Paid
+  Payment --> Payment: Past due, add late fee
+  Payment --> Appealed
+  Payment --> Assessed
+  Closed --> [*]

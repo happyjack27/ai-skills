@@ -84,6 +84,13 @@ The essentials:
    the board is for humans tracking work, not a place to dump research output.
 4. If it needs to show on a sprint taskboard, explicitly set `System.IterationPath` — new items
    default to the project root, not the current sprint or the parent's iteration.
+   **Do not reuse a parent PBI's `IterationPath` as a shortcut** — a PBI that's been open a while
+   is often still sitting in an old/closed sprint. Actually run:
+   ```powershell
+   Invoke-TfsApi -RelativeUri "work/teamsettings/iterations?`$timeframe=current" -TeamId $teamId
+   ```
+   and use `.value[0].path` from that result. After creating, re-fetch the new item and confirm its
+   `IterationPath` matches the query result — don't just trust the value you intended to send.
 5. Report back the new id and a link: `{collection}/{project}/_workitems/edit/{id}`.
 
 ### Moving a card / changing state
@@ -138,6 +145,22 @@ When validating create/update/comment functions against the real board (not just
 - Forgetting to set `System.IterationPath` on a new item — it defaults to the project root, so it
   won't show on any sprint taskboard until explicitly moved into the current sprint (check with
   `$timeframe=current`, don't assume the parent's iteration is the current one).
+- **Copying a parent PBI's `IterationPath` onto new child Tasks instead of querying
+  `$timeframe=current`** — happened live (2026-08-05, PBI #373, Tasks #515-#520): the parent PBI
+  had been open since sprint `07-20-2026`, which had since closed, so all 6 new tasks were created
+  into a dead sprint and didn't show on the taskboard. Having already fetched the parent's
+  iteration for linking purposes makes this shortcut tempting — treat "get the parent's iteration"
+  and "get the current sprint" as two unrelated lookups, never substitute one for the other.
+- **Bundling an Accela-Admin-console config action into the same card as a code/script change,
+  just because they're both "about inspections" (or some other shared theme)** — happened live
+  (2026-08-05, PBI #373): a card titled "inspections (IRSA scripts + result config)" mixed real
+  `.js` file edits with "reactivate the Duplicate inspection result / add a Void result", which is
+  pure Accela Admin console work with zero code involved. Had to split it into a separate config-
+  only card afterward. **The split test is "does this require opening Accela Admin, or opening an
+  editor?"** — if a single card's bullets would require both, it's two cards. Put "(Accela Admin
+  config)" or similar in the title of any config-only card so this is unambiguous at a glance, and
+  never let a component/theme grouping (inspections, workflow, scripts) override the config-vs-code
+  split.
 - Creating throwaway/test work items directly on the real board without confirming with the user
   first — when testing, confirm the exact payload before each write, and agree on cleanup
   (state → Removed, or destroy) up front.
@@ -151,8 +174,11 @@ When validating create/update/comment functions against the real board (not just
 - [ ] Confirmed the work item type's legal states before changing `System.State`.
 - [ ] Used the batch id-list fetch for multi-item WIQL results, not N individual calls.
 - [ ] Reported back a direct link (`_workitems/edit/{id}`) after creating/updating an item.
-- [ ] Set `System.IterationPath` explicitly if the item needs to appear on a sprint taskboard.
+- [ ] Set `System.IterationPath` explicitly if the item needs to appear on a sprint taskboard —
+      via a fresh `$timeframe=current` query, not copied from a parent/related item.
 - [ ] Used `-ParentId` (relations op), not a `System.Parent` field, for parent/child links.
+- [ ] Every card is either pure Accela-Admin-console config or pure code/script work, never both —
+      if a card's bullets mix "go configure X in Admin" with "edit this .js file", split it.
 
 ## Related Skills
 

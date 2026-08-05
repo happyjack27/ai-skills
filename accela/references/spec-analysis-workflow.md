@@ -27,10 +27,10 @@ manual-system-actions doc once analysis is complete, but starts life as this scr
 Before diving into DB research, create (or confirm there already is) a TFS work item that
 represents fleshing this spec out into concrete action items — using
 [`../../tfs-boards/SKILL.md`](../../tfs-boards/SKILL.md). This tracks the *analysis/planning*
-phase itself (Steps 2-7 below) so it shows up on the board from the moment work starts, not just
+phase itself (Steps 2-8 below) so it shows up on the board from the moment work starts, not just
 once an implementation plan exists.
 
-- Don't wait for Step 8's per-phase cards — those come later and cover the *implementation* work
+- Don't wait for Step 9's per-phase cards — those come later and cover the *implementation* work
   once the plan is known. This item covers "figure out what the plan even is."
 - A single `Task` (or `Product Backlog Item` if no parent exists yet for this record-type change)
   titled something like "Analyze <spec name> and produce implementation plan" is enough — it isn't
@@ -121,6 +121,13 @@ For every piece of the normalized behavior, classify it:
   that could plausibly mean two different things operationally. Don't guess and don't silently pick
   one — list the question plainly, e.g. `local-notes/<project>/questions-for-requestor.md`, so the
   user can forward it as-is.
+  - **Before adding anything here, grep/read the target record type's own sibling scripts first.**
+    A behavior that looks like it needs the requestor to weigh in ("should duplicates really
+    auto-close?") is very often just a missing feature that a near-identical sibling record type
+    already implements — e.g. Skid Violation's spec calling for duplicate-detection turned out to
+    be a plain gap (its `ASA` script had zero dedup logic) with an exact precedent to copy
+    (Construction Material's `ASA` script). That's a Step 5/normal-implementation item, not a
+    business question — don't escalate it to the requestor just because it's not implemented yet.
 
 Write these as a separate dated "manual-system-actions" doc, grouped by theme (assignee config,
 inspection result config, destination/mapping confirmation, fee setup, workflow/status labels) —
@@ -144,7 +151,31 @@ Then implement in `accela-test`, per [`emse-scripts.md`](emse-scripts.md), and r
 about the deploy step (copy to `accela_scripts`) — implementing in `accela-test` alone does not
 change production/test system behavior.
 
-## Step 8 — Create TFS Work Items for the Major Steps
+## Step 8 — Write Plain-Language Explainer Docs for the Requestor
+
+The implementation plan (Step 7) and manual-actions doc (Step 6) are written for you/the next
+developer — dense, technical, cross-referenced. The requestor also needs a **separate**,
+plain-language explanation of what's changing and why, or they have no way to sanity-check the
+plan against their own mental model of the business process.
+
+- Write one short `.md` file per major component (mirror however Step 9's TFS cards end up split —
+  e.g. one for Workflow, one for Inspections, one for Scripts, one for Testing), in the same
+  `local-notes/<project>/` folder, named `<project>-<component>-explainer.md`.
+- Each file: what's changing, current state vs. target state, in plain sentences — no SQL, no
+  table/column names unless truly necessary. Ground every claim in facts already gathered in
+  Steps 2-6; never invent a fact to fill a gap — flag it as an open item to confirm instead (e.g.
+  "confirm during testing" or "confirm with admin").
+- **Include a Mermaid diagram of the end-state record lifecycle** (a `flowchart` or `stateDiagram`
+  covering creation → every task/result branch → close, using the actual status/result names) for
+  at least the primary workflow file — this is usually the fastest way for a non-technical
+  requestor to confirm the plan matches their intent.
+- **Do this as soon as the implementation plan (Step 7) is drafted, not as an afterthought.** This
+  step was requested up front in a real task (2026-08-05, PBI #373 Skid Violation) and then
+  dropped/forgotten across several follow-up turns (bulleted TFS descriptions, a test-cases file,
+  card splits) — the user had to ask for it three separate times before it got done. Treat it as
+  a checklist item you complete immediately after Step 7, not something to get back to eventually.
+
+## Step 9 — Create TFS Work Items for the Major Steps
 
 Before starting the actual work (script edits, asking the user to make Admin changes), turn the
 implementation plan's phases into TFS cards, using [`../../tfs-boards/SKILL.md`](../../tfs-boards/SKILL.md).
@@ -156,13 +187,26 @@ progress on the board as you go, not to log it retroactively.
   ASI field, new fee item, new workflow status label — one per distinct Admin action, since each
   needs the user/an admin to actually go do it) and **script** items (one per EMSE script file or
   tightly-related group of files, e.g. "IRSA/WTUA/ASA changes for Skid Violation").
+  - **Never merge an Admin config item into a script card just because they cover the same
+    component/theme** (e.g. both are "about inspections"). Test: would doing this item require
+    opening the Accela Admin console, or opening an editor? Those are always two different cards,
+    even if a component-based grouping (Inspections/Workflow/Scripts) would otherwise put them
+    together. This was gotten wrong in practice (2026-08-05, PBI #373): a card titled "inspections
+    (IRSA scripts + result config)" bundled real script edits with a pure Admin-console action
+    (reactivate an inspection result, add a new one) and had to be split apart after the user
+    caught it. Put "(Accela Admin config)" in the title of any config-only card so the split is
+    obvious at a glance.
 - Use `Task` for concrete execution work, `Bug` only if the spec is fixing a defect in existing
   behavior, `Product Backlog Item` for the overall record-type change if one doesn't already exist
   to parent the Tasks under — check first rather than assuming a PBI is already there (this may
   already be the item created in Step 1, in which case parent the new Tasks under it).
 - Set `System.IterationPath` explicitly on each new item (defaults to project root, not the current
   sprint) and use `-ParentId` to link Tasks under the PBI — see the tfs-boards skill's Common
-  Mistakes for both gotchas.
+  Mistakes for both gotchas. **Don't copy the parent PBI's `IterationPath` blindly** — a PBI that's
+  been open a while is often still sitting in an old/closed sprint. Actually query
+  `work/teamsettings/iterations?$timeframe=current` and use that value, then verify by re-fetching
+  the new item and comparing against the query result — don't just trust the value you intended to
+  send.
 - Note each work item's id/link in the implementation plan doc next to the phase it corresponds to,
   so the doc and the board cross-reference each other.
 
@@ -174,9 +218,9 @@ without re-deriving what's done. If the work is tracked on the TFS board, mirror
 (move the card, add a comment) per [`../../tfs-boards/SKILL.md`](../../tfs-boards/SKILL.md) —
 don't let the doc and the board drift out of sync.
 
-## Step 9 — Feed Discoveries Back Into the Skill
+## Step 10 — Feed Discoveries Back Into the Skill
 
-Before considering the task done, check whether anything from Steps 2-7 is worth writing into the
+Before considering the task done, check whether anything from Steps 2-8 is worth writing into the
 skill itself rather than just the task's own docs — see "Keep This Skill Current" in
 [`../SKILL.md`](../SKILL.md). In particular:
 

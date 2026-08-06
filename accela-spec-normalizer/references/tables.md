@@ -11,7 +11,7 @@ the rule is followed by the reason.
 |---|---|
 | Inspection type | Exact name as configured in Accela. One block of rows per type. |
 | Result value | Exact string from the source. Do not normalize casing or punctuation. |
-| Result group | The Accela result group the value belongs to. Usually `<gap>` in loose specs. |
+| Result group | The Accela result group the value belongs to. Optional configuration metadata, not a blocking gap — mark `—` when unstated rather than `<gap>`, and don't carry it into the gap list. Unlike every other column here, it doesn't drive routing, fees, or automation. |
 | Schedules what | Which inspection type this result causes to be scheduled, or `None`. |
 | Offset + anchor | Both halves required: `+5 calendar days from result date`. |
 | Assign to | Role, user group, or named inspector. Not "the inspector". |
@@ -19,6 +19,13 @@ the rule is followed by the reason.
 **Offset + anchor is one column on purpose.** Specs routinely give a number without
 units or without a starting point. Forcing both into one cell makes a half-answer
 visibly incomplete instead of quietly passing.
+
+**Anchor has a default for scheduling offsets.** When the spec gives an offset for the
+*next inspection* and doesn't name an anchor, default to the triggering inspection's
+result date — that's Accela's standard `scheduleInspection()` convention, not a guess.
+Only mark `<gap>` here if the spec implies some other anchor without naming it. This
+default is specific to Table A; it does not extend to fee or batch timers (Table D/E),
+where no such convention exists and the anchor is a genuine open question.
 
 ---
 
@@ -32,12 +39,13 @@ gets a row, and the blank is the finding.
 | Task | Workflow task name. |
 | Status | Exact status string. |
 | Next task | The task activated, or `Terminal`, or `<gap>`. |
-| Record disposition | `Open`, `Closed`, or `<gap>`. Independent of next task. |
+| Record disposition | `In Progress` or `Closed`. **Derived, never `<gap>`:** `Closed` only when the source explicitly closes the record ("Close Record" or equivalent); `In Progress` otherwise — even when Next task itself is still `<gap>`. A status that doesn't explicitly close the record leaves it exactly where it is. |
 | Child record created | Record type spawned, or `None`. |
 
-**Next task and disposition are separate columns** because they come apart. A status can
-close the parent while spawning a child, or advance a task while leaving the record
-open. Merging them loses the distinction.
+**Next task and disposition are separate columns** because they come apart, just not by
+both being unknown at once. A status can spawn a child and still leave the parent
+`In Progress`, or close the parent while also spawning a child. Read disposition off
+whether the source says "close" — don't infer it from whether Next task is filled in.
 
 ---
 

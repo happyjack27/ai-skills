@@ -1,3 +1,9 @@
+# Inspection lifecycle — Skid Violation
+
+Generated from Tables A + B. See [RATIONALE.md](./RATIONALE.md) for why the reinspection
+is drawn as a second node rather than a loop back to the first.
+
+```mermaid
 flowchart TD
   A[Record created] --> B["San Skid Inspection<br/>next business day, inspector"]
   B --> C["Result submitted<br/>9 result values"]
@@ -15,3 +21,4 @@ flowchart TD
   class B,G hook
   class E,F,H effect
   class A,C,D,I,J terminal
+```

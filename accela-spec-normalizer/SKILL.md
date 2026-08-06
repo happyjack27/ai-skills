@@ -60,7 +60,7 @@ column. Five tables:
 
 **Decomposition worked example.** The Collected bullet above becomes four rows:
 
-- Table B: `Reinspection | Collected | Payment | Open | —`
+- Table B: `Reinspection | Collected | Payment | In Progress | —`
 - Table C: `Reinspection | Collected | Add + invoice fee | Billing = Billed | — | Event`
 - Table D: `<gap> | <gap> | Reinspection/Collected | Cubic yards | San Skid Inspection | Yes | <gap>`
 - Table E: `Reinspection resulted Collected | Event | WorkflowTaskUpdateAfter | Status = Collected | <gap> | Add fee, invoice, set ASI, activate Payment`
@@ -123,9 +123,16 @@ Two layout rules, both learned the hard way:
   be able to see at a glance that the 37-day late fee is not triggered by anything a
   user does.
 
-Working examples live in `assets/examples/`. Read `assets/examples/RATIONALE.md`
-alongside them — it explains why each is shaped the way it is, which matters more than
-the syntax.
+Working examples live in `examples/sanitation/diagrams/`. Read
+`examples/sanitation/diagrams/RATIONALE.md` alongside them — it explains why each is
+shaped the way it is, which matters more than the syntax.
+
+Those examples are stored as `.md` files with a fenced ```mermaid``` block, not bare
+`.mmd`. This repo has no `.mmd` previewer — the installed Mermaid extension only offers
+a preview command, not a default editor association — so the fenced-Markdown form is
+what actually renders on open. This is a convention for this skill's own reference
+files only; it does not change Stage 5, where the real deliverable to Accela
+configurers is still bare `.mmd` + a generated `.svg`.
 
 ### Stage 5 — Render and assemble
 
@@ -168,5 +175,6 @@ Do not manufacture findings to look thorough.
 - `references/diagram-style.md` — mermaid theme block, palette, `classDef` lines, layout rules
 - `assets/templates/spec-template.md` — blank output template
 - `assets/templates/tables-blank.md` — blank Tables A–E for analysts filling specs by hand
-- `assets/examples/` — working mermaid for all three diagrams, plus rationale
-- `examples/sanitation/` — a complete worked example: loose source in, tables and gaps out
+- `examples/sanitation/` — a complete worked example: loose source in, tables, gaps, and
+  diagrams out (`diagrams/` holds the working mermaid for all three diagram types, plus
+  rationale)

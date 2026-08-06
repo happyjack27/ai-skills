@@ -8,19 +8,26 @@ re-reading their own document.
 
 1. **Every status has a next task or is explicitly terminal.** Dangling statuses mean a
    record that can never close. Look for statuses listed with no consequence at all —
-   these are the easiest to miss because they read as complete bullets.
+   these are the easiest to miss because they read as complete bullets. Record
+   disposition itself is derived from this (`Closed` only if the source says so,
+   `In Progress` otherwise) — don't ask the analyst a separate question about it.
 2. **Every scheduled inspection has a no-result path.** Specs describe what happens when
    an inspection is resulted and are silent on the one that never gets resulted.
-3. **Every child-record spawn states the parent's disposition.** Does the parent close,
-   stay open, or wait on the child's outcome?
+3. **Every child-record spawn names a next task for the parent, if one exists.**
+   Disposition rarely needs asking here — `In Progress` by default unless the source
+   explicitly closes the parent — but which task (if any) owns the parent afterward can
+   still be a genuine gap.
 4. **Every task has at least one inbound and one outbound transition** unless it is the
    start or a terminal.
 
 ## Time
 
 5. **Every offset names calendar or business days.** Never assume.
-6. **Every offset names its anchor.** "Within 37 days" of the invoice date and of the
-   status change are different rules producing different money.
+6. **Every offset names its anchor** — with one default: a Table A scheduling offset
+   (e.g. "schedule reinspection in 5 days") defaults to the triggering inspection's
+   result date if unstated. Everywhere else — fee timers, batch windows — there is no
+   default. "Within 37 days" of the invoice date and of the status change are different
+   rules producing different money, and neither can be assumed.
 7. **Every elapsed-time rule is marked batch, not event.** If Table C says `Event` for
    anything time-based, that is wrong and worth flagging directly.
 

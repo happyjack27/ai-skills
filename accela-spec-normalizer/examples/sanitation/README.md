@@ -7,3 +7,6 @@ and which questions the tables forced into the open.
 The most instructive single line is the Collected bullet, which decomposes into four
 rows across three tables and exposes a cross-inspection data read that is completely
 invisible in the original.
+
+`diagrams/` holds the three mermaid diagrams generated from these tables (Stage 4),
+plus `RATIONALE.md` explaining the shaping decisions behind each one.

@@ -6,7 +6,7 @@
 |---|---|
 | Record type (group / type / subtype / category) | `<gap>` |
 | Workflow name | Skid Violation Workflow |
-| Workflow tasks | Inspection, Reinspection, Payment |
+| Workflow tasks | Inspection, Reinspection, Payment, Appeal, Assessment |
 | Inspection group | `<gap>` |
 | Inspection types | San Skid Inspection, San Skid Reinspection |
 | Fee schedule | `<gap>` |
@@ -18,39 +18,39 @@
 
 | Inspection type | Result value | Result group | Schedules what | Offset + anchor | Assign to |
 |---|---|---|---|---|---|
-| San Skid Inspection | No Violation | `<gap>` | None | — | — |
-| San Skid Inspection | 1-4 cubic yards | `<gap>` | San Skid Reinspection | +5 calendar days, anchor `<gap>` | `<gap>` |
-| San Skid Inspection | 4+ cubic yards | `<gap>` | San Skid Reinspection | +5 calendar days, anchor `<gap>` | `<gap>` |
-| San Skid Inspection | Immediate – 1-4 cubic yards | `<gap>` | San Skid Reinspection | Next business day, anchor `<gap>` | `<gap>` |
-| San Skid Inspection | Immediate 4+ cubic yards | `<gap>` | San Skid Reinspection | Next business day, anchor `<gap>` | `<gap>` |
-| San Skid Inspection | Refer to DNS | `<gap>` | None | — | — |
-| San Skid Inspection | City Property – Illegal Dumping | `<gap>` | None | — | — |
-| San Skid Inspection | Duplicate | `<gap>` | None | — | — |
-| San Skid Inspection | Void | `<gap>` | None | — | — |
-| San Skid Reinspection | Collected | `<gap>` | None | — | — |
-| San Skid Reinspection | Done by Owner | `<gap>` | None | — | — |
-| San Skid Reinspection | Not Collected | `<gap>` | None | — | — |
+| San Skid Inspection | No Violation | — | None | — | — |
+| San Skid Inspection | 1-4 cubic yards | — | San Skid Reinspection | +5 calendar days, anchor = inspection result date | `<gap>` |
+| San Skid Inspection | 4+ cubic yards | — | San Skid Reinspection | +5 calendar days, anchor = inspection result date | `<gap>` |
+| San Skid Inspection | Immediate – 1-4 cubic yards | — | San Skid Reinspection | Next business day, anchor = inspection result date | `<gap>` |
+| San Skid Inspection | Immediate 4+ cubic yards | — | San Skid Reinspection | Next business day, anchor = inspection result date | `<gap>` |
+| San Skid Inspection | Refer to DNS | — | None | — | — |
+| San Skid Inspection | City Property – Illegal Dumping | — | None | — | — |
+| San Skid Inspection | Duplicate | — | None | — | — |
+| San Skid Inspection | Void | — | None | — | — |
+| San Skid Reinspection | Collected | — | None | — | — |
+| San Skid Reinspection | Done by Owner | — | None | — | — |
+| San Skid Reinspection | Not Collected | — | None | — | — |
 
 ## Table B — Workflow status routing
 
 | Task | Status | Next task | Record disposition | Child record created |
 |---|---|---|---|---|
 | Inspection | No Violation | Terminal | Closed | None |
-| Inspection | 1-4 cubic yards | Reinspection | Open | None |
-| Inspection | 4+ cubic yards | Reinspection | Open | None |
-| Inspection | Immediate – 1-4 cubic yards | Reinspection | Open | None |
-| Inspection | Immediate 4+ cubic yards | Reinspection | Open | None |
-| Inspection | Refer to DNS | `<gap>` | `<gap>` | Scattered Litter/Debris Request |
-| Inspection | City Property – Illegal Dumping | `<gap>` | `<gap>` | City Property Cleanup Request |
+| Inspection | 1-4 cubic yards | Reinspection | In Progress | None |
+| Inspection | 4+ cubic yards | Reinspection | In Progress | None |
+| Inspection | Immediate – 1-4 cubic yards | Reinspection | In Progress | None |
+| Inspection | Immediate 4+ cubic yards | Reinspection | In Progress | None |
+| Inspection | Refer to DNS | `<gap>` | In Progress | Scattered Litter/Debris Request |
+| Inspection | City Property – Illegal Dumping | `<gap>` | In Progress | City Property Cleanup Request |
 | Inspection | Duplicate | Terminal | Closed | None |
 | Inspection | Void | Terminal | Closed | None |
-| Reinspection | Collected | Payment | Open | None |
+| Reinspection | Collected | Payment | In Progress | None |
 | Reinspection | Done by Owner | Terminal | Closed | None |
 | Reinspection | Not Collected | Terminal | Closed | None |
 | Payment | Paid | Terminal | Closed | None |
-| Payment | Past Due | Payment | Open | None |
-| Payment | Appealed | `<gap>` | `<gap>` | None |
-| Payment | Assessed | `<gap>` | `<gap>` | None |
+| Payment | Past Due | Payment | In Progress | None |
+| Payment | Appealed | Appeal | In Progress | None |
+| Payment | Assessed | Assessment | In Progress | None |
 
 ## Table C — Status side effects
 
@@ -95,10 +95,13 @@ will fire `WorkflowTaskUpdateAfter` on the Payment task as a cascade. Guard for 
    days" does not say what makes two records duplicates — address, location ID, or skid
    ID — nor whether the 7 days counts from the earlier record's open date or its
    inspection date.
-5. **Appealed and Assessed have no outbound transition.** As written, a record entering
-   either can never close.
-6. **Refer to DNS and City Property leave the parent undefined.** Both create a child
-   record; neither says whether the parent closes, stays open, or waits on the child.
+5. **Appeal and Assessment tasks have no stated resolution.** `Appealed`/`Assessed`
+   name where they hand off to, but neither task's own result values or next steps
+   appear in the source, so a record entering either still has no stated path to close.
+6. **Refer to DNS and City Property don't name a next task for the parent.** Both
+   create a child record and, absent an explicit close, leave the parent In Progress by
+   default — but no task is named to own the parent afterward, nor whether it waits on
+   the child's outcome.
 7. **37 days from when, and who sets Past Due?** Invoice date or status-change date, and
    batch job or clerk.
 8. **"Notify Supervisor" names no recipient and no channel.** Needs a user group or

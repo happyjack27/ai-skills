@@ -1,7 +1,8 @@
 # Workflow state graph — Skid Violation
 
 Generated from Table B. See [RATIONALE.md](./RATIONALE.md) for why the four cubic-yard
-results collapse into two edges and why `Appealed`/`Assessed` are drawn as dead ends.
+results collapse into two edges and why `Appealed`/`Assessed` are drawn as self-loops
+rather than dead ends.
 
 ```mermaid
 stateDiagram-v2
@@ -16,7 +17,7 @@ stateDiagram-v2
   Reinspection --> Closed: Not collected
   Payment --> Closed: Paid
   Payment --> Payment: Past due, add late fee
-  Payment --> Appeal: Appealed
-  Payment --> Assessment: Assessed
+  Payment --> Payment: Appealed, set Under Appeal
+  Payment --> Payment: Assessed, set Assessment Issued
   Closed --> [*]
 ```

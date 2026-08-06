@@ -27,7 +27,7 @@ the loose document at least announced its own vagueness.
 
 ## Pipeline
 
-Work through these five stages in order. Do not skip ahead to diagrams — diagrams
+Work through these six stages in order. Do not skip ahead to diagrams — diagrams
 generated from prose invent transitions that were never in the source.
 
 ### Stage 1 — Ingest
@@ -40,6 +40,21 @@ extract-text /path/to/spec.docx
 
 Works for `.docx`, `.odt`, `.pptx`, `.xlsx`. For `.pdf`, check `pdffonts` first; if no
 fonts are listed the file is a scan and needs OCR.
+
+**Check for embedded images before treating the extraction as complete.** A `.docx`
+that is a megabyte-plus but extracts to a couple hundred words of text is not a short
+spec — it's a spec with a pasted screenshot. Text extractors skip images silently, so
+the extracted text will look complete (clean headings, tidy bullet lists) while the
+actual workflow diagram — which status goes to which task, whether a record closes —
+exists only as pixels. Check before assuming the bullets are the whole document:
+
+```bash
+unzip -l spec.docx | grep media/
+```
+
+If `word/media/` (or `ppt/media/`, `xl/media/`) has anything image-sized, open it and
+read it as source material with the same weight as the prose — do not normalize from
+the text alone and treat the image as decorative.
 
 Read the whole thing before writing anything. Specs frequently define a result value in
 one section and its consequence three sections later.
@@ -152,12 +167,38 @@ Assemble the deliverable using `assets/templates/spec-template.md`:
 ```
 <record-type>-spec/
 ├── spec.md              filled template: header card + Tables A-E
+├── spec.docx            generated: same content, one file, for non-technical reviewers
 ├── gaps.md              numbered unanswered questions
 └── diagrams/
     ├── workflow.mmd     source of truth
     ├── workflow.svg     generated
     └── ...
 ```
+
+### Stage 6 — Consolidate to .docx
+
+Generate one reviewer-facing `.docx` holding every normalized piece — header card, open
+questions, Tables A–E, and the three diagrams — for readers who don't want raw markdown
+or mermaid. This is additive: never delete or replace the `.md`/`.mmd`/`.svg`
+deliverables. The `.docx` is a generated export, same rule as Stage 5's `.svg`.
+
+```bash
+bash scripts/render-docx.sh spec.md
+```
+
+The script renders a `.png` copy of each diagram purely for embedding — Word can't
+reliably embed a bare `.svg` without a local converter. Rendering falls back in this
+order: local `mmdc`, then `npx --yes @mermaid-js/mermaid-cli` (fetches mermaid-cli on
+demand — this only needs npm registry access, so it works even on networks that block
+the Kroki HTTP fallback below), then `rsvg-convert`, then the Kroki HTTP API. It also
+picks up diagrams that only exist as a fenced ` ```mermaid ` block inside a `.md` (no
+`.mmd`/`.svg` ever generated), so Stage 6 doesn't silently skip them. Once images exist,
+`pandoc` assembles `spec.md` — which must already reference them with `![](...)` links —
+into `spec.docx`. **Check the rendered images actually landed in the `.docx`** (unzip it
+and look in `word/media/`, or just open it) before calling Stage 6 done — a `.docx` that
+still contains raw mermaid source text as a paragraph means rendering silently failed
+somewhere in that fallback chain. If `pandoc` isn't available at all, say so plainly and
+deliver the `.md`/`.mmd`/`.svg` set alone rather than skipping the step silently.
 
 ## Reporting back
 
@@ -175,6 +216,8 @@ Do not manufacture findings to look thorough.
 - `references/diagram-style.md` — mermaid theme block, palette, `classDef` lines, layout rules
 - `assets/templates/spec-template.md` — blank output template
 - `assets/templates/tables-blank.md` — blank Tables A–E for analysts filling specs by hand
-- `examples/sanitation/` — a complete worked example: loose source in, tables, gaps, and
-  diagrams out (`diagrams/` holds the working mermaid for all three diagram types, plus
-  rationale)
+- `scripts/render.sh` — renders `.mmd` diagrams to `.svg` (Stage 5)
+- `scripts/render-docx.sh` — consolidates `spec.md` + diagrams into one `.docx` (Stage 6)
+- `examples/sanitation/` — a complete worked example: loose source in, tables, gaps,
+  diagrams, and a consolidated `.docx` out (`diagrams/` holds the working mermaid for
+  all three diagram types, plus rationale)

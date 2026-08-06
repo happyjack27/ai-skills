@@ -6,11 +6,11 @@
 |---|---|
 | Record type (group / type / subtype / category) | `<gap>` |
 | Workflow name | Skid Violation Workflow |
-| Workflow tasks | Inspection, Reinspection, Payment, Appeal, Assessment |
+| Workflow tasks | Inspection, Reinspection, Payment |
 | Inspection group | `<gap>` |
 | Inspection types | San Skid Inspection, San Skid Reinspection |
 | Fee schedule | `<gap>` |
-| ASI groups and fields | Billing (value: Billed); group and full value list `<gap>` |
+| ASI groups and fields | Billing Status (value: Billed; full value list `<gap>`); Appeal/Assessment flag field name `<gap>` (values: Under Appeal, Assessment Issued) |
 | Child record types | Scattered Litter/Debris Request, City Property Cleanup Request |
 | Scripts and batch jobs | ASA, IRSA, WTUA, PRA, nightly past-due batch |
 
@@ -31,6 +31,11 @@
 | San Skid Reinspection | Done by Owner | — | None | — | — |
 | San Skid Reinspection | Not Collected | — | None | — | — |
 
+**Initial inspection isn't a result-driven row.** On record creation (and not flagged
+Duplicate), San Skid Inspection itself is scheduled for the next business day from
+record creation and assigned to the Sanitation Inspector role. Everything above governs
+*results*, not the record's first inspection — see Table E.
+
 ## Table B — Workflow status routing
 
 | Task | Status | Next task | Record disposition | Child record created |
@@ -49,20 +54,34 @@
 | Reinspection | Not Collected | Terminal | Closed | None |
 | Payment | Paid | Terminal | Closed | None |
 | Payment | Past Due | Payment | In Progress | None |
-| Payment | Appealed | Appeal | In Progress | None |
-| Payment | Assessed | Assessment | In Progress | None |
+| Payment | Appealed | `<gap>` | In Progress | None |
+| Payment | Assessed | `<gap>` | In Progress | None |
+
+The diagram states "(Do not close record)" explicitly for both Appealed and Assessed —
+disposition is a stated fact here, not the derived default. Next task is still `<gap>`:
+"Under Appeal" and "Assessment Issued" read as status labels the diagram draws next to
+the status, not task names, and nothing routes onward from either.
 
 ## Table C — Status side effects
 
 | Task | Status | Fee action | ASI update | Notification | Trigger type |
 |---|---|---|---|---|---|
 | Inspection | Duplicate | None | None | None | Event, if within 7 days; otherwise manual |
-| Reinspection | Collected | Add + invoice | Billing = Billed | None | Event |
-| Reinspection | Not Collected | None | None | Supervisor `<gap role>`, channel `<gap>` | Event |
+| Reinspection | Collected | Add + invoice | Billing Status = Billed | None | Event |
+| Reinspection | Not Collected | None | Comment added (target field `<gap>`) | Supervisor `<gap role>`, channel `<gap>` | Event |
 | Payment | Past Due | Add late fee | None | None | Batch |
+| Payment | Appealed | None | `<gap field>` = Under Appeal | None | Event |
+| Payment | Assessed | None | `<gap field>` = Assessment Issued | None | Event |
 
 Note the Reinspection/Collected row: the effect updates a workflow task, so the script
 will fire `WorkflowTaskUpdateAfter` on the Payment task as a cascade. Guard for it.
+
+**"Billing" is modeled here as an ASI update, not a task.** The diagram draws it as its
+own swimlane between Reinspection and Payment, the same visual weight as the three
+real tasks. ASI updates don't normally get their own SPROCESS task in Accela, so this
+is modeled as the Billing Status field changing on Reinspection/Collected — matching
+the original loose bullet ("Update Billing to Billed") — rather than as a fourth task.
+Confirm this reading; see open question 6.
 
 ## Table D — Fee definitions
 
@@ -75,11 +94,14 @@ will fire `WorkflowTaskUpdateAfter` on the Payment task as a cascade. Guard for 
 
 | Trigger | Event or batch | Event name | Condition | Match key | Effect |
 |---|---|---|---|---|---|
-| Record created | Event | ApplicationSubmitAfter | Prior record within 7 cal days | `<gap>` | Set Duplicate, close; else schedule inspection |
+| Record created | Event | ApplicationSubmitAfter | Prior record within 7 cal days | `<gap>` | If duplicate: set Duplicate, close. Else: schedule San Skid Inspection next business day from creation, assign Sanitation Inspector |
 | Inspection resulted | Event | InspectionResultSubmitAfter | Result value | — | updateTask, scheduleInspection, create child |
-| Reinspection Collected | Event | WorkflowTaskUpdateAfter | Status = Collected | — | Read prior inspection result, addFee, invoiceFee, set ASI, activate Payment (cascades) |
+| Reinspection Collected | Event | WorkflowTaskUpdateAfter | Status = Collected | — | Read prior inspection result, addFee, invoiceFee, set Billing Status = Billed, activate Payment (cascades) |
+| Reinspection Not Collected | Event | WorkflowTaskUpdateAfter | Status = Not Collected | — | Add comment, notify supervisor, close record |
 | Payment received | Event | PaymentReceiveAfter | Balance zero `<gap>` | — | updateTask Payment = Paid, close |
 | Invoice ages 37 days | Batch | `<gap>` | Unpaid at 37 days | — | addFee late fee, set Past Due |
+| Payment Appealed | Event | WorkflowTaskUpdateAfter | Status = Appealed | — | Set `<gap field>` = Under Appeal; do not close |
+| Payment Assessed | Event | WorkflowTaskUpdateAfter | Status = Assessed | — | Set `<gap field>` = Assessment Issued; do not close |
 
 ## Open questions
 
@@ -95,15 +117,22 @@ will fire `WorkflowTaskUpdateAfter` on the Payment task as a cascade. Guard for 
    days" does not say what makes two records duplicates — address, location ID, or skid
    ID — nor whether the 7 days counts from the earlier record's open date or its
    inspection date.
-5. **Appeal and Assessment tasks have no stated resolution.** `Appealed`/`Assessed`
-   name where they hand off to, but neither task's own result values or next steps
-   appear in the source, so a record entering either still has no stated path to close.
-6. **Refer to DNS and City Property don't name a next task for the parent.** Both
+5. **Appeal/Assessment flag has no stated resolution and no named field.** Appealed
+   sets a flag to "Under Appeal" and Assessed to "Assessment Issued," both explicitly
+   not closing the record — but neither the ASI/custom field name nor anything that
+   later resolves the flag (a manual close? a third Payment status?) appears in the
+   source.
+6. **Is Billing a real workflow task, or the diagram's staging for an ASI update?**
+   Modeled here as the Billing Status field changing on Reinspection/Collected, matching
+   the loose spec's "Update Billing to Billed" — not as a fourth SPROCESS task. The
+   diagram draws it with the same visual weight as Inspection/Reinspection/Payment, so
+   confirm this reading before configuring.
+7. **Refer to DNS and City Property don't name a next task for the parent.** Both
    create a child record and, absent an explicit close, leave the parent In Progress by
    default — but no task is named to own the parent afterward, nor whether it waits on
    the child's outcome.
-7. **37 days from when, and who sets Past Due?** Invoice date or status-change date, and
+8. **37 days from when, and who sets Past Due?** Invoice date or status-change date, and
    batch job or clerk.
-8. **"Notify Supervisor" names no recipient and no channel.** Needs a user group or
+9. **"Notify Supervisor" names no recipient and no channel.** Needs a user group or
    module role, and email versus in-platform.
-9. **No path exists for a reinspection that is never resulted.**
+10. **No path exists for a reinspection that is never resulted.**

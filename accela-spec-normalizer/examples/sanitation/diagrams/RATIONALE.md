@@ -20,11 +20,14 @@ graph had four parallel edges between the same pair of states and the labels sta
 top of each other. The information is not lost; it lives in Table B, which is where
 someone looking up a specific status will actually go.
 
-`Appeal` and `Assessment` — the tasks that `Appealed`/`Assessed` hand off to — are drawn
-with no outbound transition. That is deliberate. The hand-off itself is stated in
-Table B, so it is not a gap; what neither task resolves to afterward is. Drawing them
-as dead ends makes that omission visible instead of quietly tidying it away, and it is
-the diagram's job to show the spec as written.
+`Appealed` and `Assessed` are drawn as self-loops on Payment, the same shape as
+`Past Due`. That is deliberate, and it is a stronger claim than "unknown": the source
+explicitly says "(Do not close record)" for both, so `In Progress` is a stated fact
+here, not the derived default. What's still missing is a next task — nothing routes
+anywhere from either status, and the diagram gives them status-looking labels ("Under
+Appeal", "Assessment Issued") rather than task names. Drawing them as loops instead of
+dead ends says exactly that: the record is not stuck, it is *not currently going
+anywhere either* — see Tables B and C, and open questions 5–6.
 
 ## inspection-lifecycle.md
 

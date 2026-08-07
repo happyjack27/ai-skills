@@ -30,7 +30,7 @@ represents fleshing this spec out into concrete action items — using
 phase itself (Steps 2-8 below) so it shows up on the board from the moment work starts, not just
 once an implementation plan exists.
 
-- Don't wait for Step 9's per-phase cards — those come later and cover the *implementation* work
+- Don't wait for Step 10's per-phase cards — those come later and cover the *implementation* work
   once the plan is known. This item covers "figure out what the plan even is."
 - A single `Task` (or `Product Backlog Item` if no parent exists yet for this record-type change)
   titled something like "Analyze <spec name> and produce implementation plan" is enough — it isn't
@@ -82,6 +82,18 @@ or a sibling one — time-based behavior the spec asks for ("past due after N da
 within N days") usually can't be computed from an incoming event alone and needs a daily batch job.
 A sibling's existing batch job (e.g. `BATCH_SAN_CONSTMAT_PAST_DUE.js`) is the pattern to model a new
 one on, not something to design from scratch.
+
+**Never reuse an existing inspection type string (`scheduleInspection("X", ...)` / `inspType == "X"`)
+without confirming which record type actually owns it.** A shared `INSP_CODE` group (see
+[`database-schema.md`](database-schema.md)'s Inspections section) is normal and fine to reuse — the
+individual `INSP_TYPE` rows inside it are not automatically shared just because they're visible in
+that group. Grep every sibling script for the literal type string first; if it's the name a
+*different* category's own dedicated script branches on, it belongs to that category, no matter how
+generic the name sounds (`"San. Inspection"` turned out to belong to a distinct
+`Enforcement/Complaint/Sanitation/Inspection` record type, not to Skid Violation, even though both
+share the same `INSP_CODE` — caught only after scripts were already written and committed against
+it). The record type you're working on needs its own dedicated `INSP_TYPE` — new Admin config, not
+a code fix.
 
 ## Step 5 — Normalize the Requested Behavior
 
@@ -175,7 +187,83 @@ plan against their own mental model of the business process.
   card splits) — the user had to ask for it three separate times before it got done. Treat it as
   a checklist item you complete immediately after Step 7, not something to get back to eventually.
 
-## Step 9 — Create TFS Work Items for the Major Steps
+## Step 9 — Consolidate into a Design-Confirmation `.docx` for the Requestor
+
+The explainer(s) from Step 8 and the test cases from Step 7 are the last things that exist
+*before* any code is written. Package them into a single reviewer-facing `.docx` and get the
+requestor to confirm it matches their intent **before** starting the implementation tail end of
+Step 7 — this is the cheapest point to catch a misread requirement, and the last one before it
+costs a rewrite. If schedule pressure forces implementation to start in parallel, say so to the
+user explicitly as a flagged risk rather than silently skipping the checkpoint.
+
+This is a distinct deliverable from Step 7/8's own docs, not a repackaging of all of them — it
+drops everything that's only meaningful to the developer/admin building the thing:
+
+| Keep (drives confirmation) | Drop (internal/dev-only) |
+|---|---|
+| End-to-end lifecycle diagram + walkthrough (Step 8) | prod-config-reference doc (Step 3) |
+| Open questions needing the requestor's answer (Step 6) | manual-system-actions doc (Step 6) |
+| Test scenarios, plain-language (Step 7) | implementation plan phases/file lists (Step 7) |
+| | database/table/column names |
+
+### Organization
+
+One `.md` file, in this order (blank starting point:
+[`../templates/design-confirmation-template.md`](../templates/design-confirmation-template.md)):
+
+1. **Cover** — record type, source spec + date, doc status (draft / in review / confirmed), TFS
+   link(s), and a one-paragraph purpose statement: *this is our understanding of the target
+   design; please confirm it before we build it.*
+2. **What's changing** — 2-3 sentences per component (Workflow/Inspections/Scripts/etc.), each
+   pulled from that Step 8 explainer's own "Current state vs. target state" section — summarize,
+   don't reproduce the whole explainer.
+3. **The end-to-end record lifecycle (target state)** — the Step 8 diagram, embedded as a
+   rendered image, followed by the same plain-language step-by-step walkthrough from the
+   workflow explainer. This is the section the user asked to lead with, and it's the fastest way
+   for a non-technical reader to confirm the shape of the design.
+4. **Decisions we need you to confirm** — every item from Step 6's "needs the requestor's
+   clarification" list plus each explainer's "open items to confirm" checklist, de-duplicated and
+   rephrased as plain business questions (no SQL/config detail). Call this section out visibly
+   (bold header, numbered) — it's the actual ask, not background reading.
+5. **Test scenarios to validate** — the Step 7 test-cases doc, reworded as "if this happens, this
+   should happen" rows grouped by phase (creation → inspection → reinspection → billing/payment →
+   regression), same order as the source doc. Keep status/result names verbatim — the requestor
+   will recognize them from the live system — but drop TFS IDs, script filenames, and internal
+   fee/table codes that mean nothing to them.
+6. **How to respond** — one short paragraph: confirm/answer each numbered item in section 4, and
+   flag any row in section 5 whose expected result doesn't match their intent.
+
+### Building it
+
+```bash
+bash ../scripts/render-docx.sh <project>-design-confirmation.md
+```
+
+[`../scripts/render-docx.sh`](../scripts/render-docx.sh) is a vendored copy of the
+`accela-spec-normalizer` skill's own render script (copied in, not linked, since the two skills'
+diagram conventions have diverged — see "Borrowed from `accela-spec-normalizer`" below). Keep
+diagrams for this doc as **one edge per result value**, not consolidated by shared source/target —
+that's the layout this skill's own end-to-end lifecycle diagrams already use and is preferred over
+the more consolidated style `accela-spec-normalizer` uses for its own diagrams.
+
+- The script embeds each diagram as a rendered image, falling back `mmdc` → `npx @mermaid-js/mermaid-cli`
+  → `rsvg-convert` → the Kroki HTTP API — say so plainly and hand over the `.md` alone if none are
+  available, rather than shipping a `.docx` with raw mermaid text pasted in as a paragraph.
+- **Verify the images actually landed** (unzip the `.docx` and check `word/media/`, or just open
+  it) before calling this done.
+- Save the output in the project's `local-notes/<project name>/` folder alongside the other docs.
+
+### Borrowed from `accela-spec-normalizer`
+
+That skill solves the same "loose spec → something a requestor can validate" problem and already
+had a working `.docx` consolidation pipeline. The **only** thing taken from it here is that
+render script (vendored as [`../scripts/render-docx.sh`](../scripts/render-docx.sh)) — its diagram
+consolidation style and `<gap>`-tagging convention are deliberately *not* adopted: this skill's
+existing per-result-value diagram layout is preferred, and whether an equivalent to the `<gap>`
+convention makes sense here is still an open question, not a decision — revisit it later rather
+than importing it by default.
+
+## Step 10 — Create TFS Work Items for the Major Steps
 
 Before starting the actual work (script edits, asking the user to make Admin changes), turn the
 implementation plan's phases into TFS cards, using [`../../tfs-boards/SKILL.md`](../../tfs-boards/SKILL.md).
@@ -218,7 +306,7 @@ without re-deriving what's done. If the work is tracked on the TFS board, mirror
 (move the card, add a comment) per [`../../tfs-boards/SKILL.md`](../../tfs-boards/SKILL.md) —
 don't let the doc and the board drift out of sync.
 
-## Step 10 — Feed Discoveries Back Into the Skill
+## Step 11 — Feed Discoveries Back Into the Skill
 
 Before considering the task done, check whether anything from Steps 2-8 is worth writing into the
 skill itself rather than just the task's own docs — see "Keep This Skill Current" in
@@ -230,6 +318,10 @@ skill itself rather than just the task's own docs — see "Keep This Skill Curre
 - Any wrong assumption that led to a bad query or a wrong manual-action flag → correct it in the
   relevant reference file with a short note of what was wrong.
 - Any newly-confirmed EMSE event prefix or script pattern → [`emse-scripts.md`](emse-scripts.md).
+- Anything that made Step 9's design-confirmation `.docx` harder than it should've been (a diagram
+  layout that didn't survive rendering, a rendering-pipeline bug) → fix it directly in
+  [`../scripts/render-docx.sh`](../scripts/render-docx.sh) — it's a vendored copy local to this
+  skill, not shared with `accela-spec-normalizer`, so fix it here rather than upstream.
 
 Task-specific facts (this record type's specific fee code, this spec's specific decisions) stay in
 the task's own docs under `accela-test/local-notes/` — only genuinely reusable facts belong in the

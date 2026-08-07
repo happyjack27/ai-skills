@@ -151,6 +151,32 @@ sibling record types** (e.g. all `Enforcement/Complaint/Sanitation/*`), so a res
 here may be broader than what one specific category actually uses — confirm with the user which
 subset is intended for this category before assuming every listed result applies.
 
+**Sharing the `INSP_CODE` group is normal. Reusing an existing `INSP_TYPE` row from that group for
+a *different* record type is a real mistake, even though nothing stops you technically.** Got this
+wrong in practice (2026-08-05/07, PBI #373 Skid Violation): `PW_SAN_INSP` is shared by 11+ Sanitation
+record types, and it contains generic-sounding types like `San. Inspection` / `San Re-Inspection`
+alongside clearly record-type-specific ones like `Construction Materials Inspection`,
+`Contaminated Cart Inspection`, `Skid Too Heavy - Abatement`. `San. Inspection`/`San Re-Inspection`
+looked reusable because they read as generic — they are not. They belong to a specific sibling,
+`Enforcement/Complaint/Sanitation/Inspection` (its own record type, own workflow process
+`PW_SAN_INSPECTOR`, own dedicated `ASA`/`IRSA;...!SANITATION!INSPECTION.js` scripts). Skid
+Violation's scripts were written to reuse those exact same type names, which means an inspector
+completing a Skid Violation inspection is literally recorded against the *other* record type's
+inspection type — wrong even though the DB technically allows it (both categories share the same
+`R1_UDCODE1`/`INSP_CODE`).
+- **Before reusing any existing `INSP_TYPE` string in a script, grep for that literal string across
+  `Scripts/Event/*.js`** to find which record type's own dedicated script(s) already branch on it
+  (`if (inspType == "...")`) — if it's a different category's file, it's owned by that category, full
+  stop, regardless of how generic the name sounds.
+- **Look at what naming convention the group's *other* entries already follow** (own query above) —
+  almost every sibling in a shared group has invented its own uniquely-named type
+  (`"<Record Type> Inspection"` / `"<Record Type> Re-Inspection"` or similar). A plain/generic-
+  sounding name in the same list is a signal it's some other specific record type's dedicated name,
+  not a shared default.
+- **The fix is a new `RINSPTYP` row** (new `INSP_TYPE` value, same shared `INSP_CODE` and same
+  `INSP_RESULT_GROUP` as whatever's actually appropriate) — this is Admin-console work like any
+  other row in this table, not something a script can create.
+
 ## ASI Custom Fields — `SMARTCHOICE`, `SMARTCHOICE_GROUP`, `SMARTCHOICE_OPTION`, `BAPPSPECTABLE`
 
 ⚠️ **Corrected 2026-08-05** — `SMARTCHOICE.BLOCK_NAME` is **not** a per-field custom-field label.

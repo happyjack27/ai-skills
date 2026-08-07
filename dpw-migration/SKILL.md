@@ -61,10 +61,17 @@ Reference files:
 - [`references/rmi-routing.md`](references/rmi-routing.md) — the RMI-server side (`GenericServer`/
   `RoutingChecker`/`DPWConnectionFactory`): the routing priority chain, the "subject-table-keyed
   dictionary table" gotcha, and how to tell a bad routing decision from a bad connection/login.
+- [`references/query-rewrite.md`](references/query-rewrite.md) — the `Checker.translateStatement`
+  Oracle-SQL-to-T-SQL pipeline itself (SQLines shell-out, the regex/literal substitution tables,
+  schema prefix rewriting) — the mechanism, not the incident history.
 - [`references/query-error-triage.md`](references/query-error-triage.md) — triaging
   `CheckerQueryLog`/`vCheckerQuerySummary` for live vs. stale errors, the Oracle `||`-to-T-SQL-`+`
   numeric-cast gotcha, the "fix committed but not redeployed" pattern, and how to record a query
   group's resolution (`fixed`/`pending_deploy`/`wont_fix`/`benign`) in `CheckerQueryFix`.
+- [`references/connections-credentials.md`](references/connections-credentials.md) — how a
+  database name resolves to a server/environment (`Database`/`DbEnvironment` enums) and where
+  credentials live (`ConnectionRegistry`, `db-connections.properties`), including
+  `GenericServer`'s separate legacy credential path that has to be kept in sync by hand.
 
 The essentials:
 
@@ -157,6 +164,14 @@ Three separate switches must agree; see
 - **A wrong routing decision and a failed connection to the resolved DB are different failures.**
   `migration.RoutingFallbackLog` only records the routing decision, never whether the connection
   actually succeeded — check the target server's `xp_readerrorlog` for login failures separately.
+- **A database's credentials can go stale in two places at once.** `GenericServer` has its own
+  hardcoded legacy password fallback (`getDBPassword()`/`mssql_password_PROD`) that is completely
+  separate from `db-connections.properties`/`ConnectionRegistry`. Changing one does not change the
+  other. See [`references/connections-credentials.md`](references/connections-credentials.md).
+- **Oracle `||` becomes T-SQL `+`, which is both ambiguous with arithmetic and NULL-propagating.**
+  The numeric-ambiguity case throws; the NULL case silently blanks the whole expression instead.
+  Both need separate fixes even though they're the same operator swap — see
+  [`references/query-rewrite.md`](references/query-rewrite.md).
 
 ## Validation Checklist
 
@@ -179,11 +194,13 @@ Three separate switches must agree; see
 | `DPW_Includes_DataServer_MSSQL/sql/oracle/block_pkg.sql` | `MIGRATIONS.BLOCK_PKG` |
 | `DPW_Includes_DataServer_MSSQL/sql/oracle/seed_migrated_tables.sql` | Generated control-table rows |
 | `DPW_Includes_DataServer_MSSQL/src/util/RoutingChecker.java` | Runtime query routing |
+| `DPW_Includes_DataServer_MSSQL/src/util/sqlParsing/Checker.java` | Oracle→T-SQL rewrite pipeline |
+| `DPW_Includes_DataServer_MSSQL/src/util/dbConnections/ConnectionRegistry.java` | Credential loading |
+| `DPW_Includes_DataServer_MSSQL/resources/db-connections.properties` | Per-database/environment credentials (secret) |
 | `templates/cutover-notification-email.md` | User-facing cutover notification email |
 
 ## Related Skills
 
 - [`../sql/SKILL.md`](../sql/SKILL.md)
 - [`../java/SKILL.md`](../java/SKILL.md)
-- [`../powershell/SKILL.md`](../powershell/SKILL.md)
 - [`../shared/coding-standards.md`](../shared/coding-standards.md)

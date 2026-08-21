@@ -89,19 +89,26 @@ Before assuming a spec describes brand-new work, check whether `ACCELATEST` alre
 5. **Normalize the spec** against that baseline — note what already exists vs. what's new (new
    inspection result, new fee code, new workflow status, new ASI field, new CRM mapping).
 6. **Write/update the EMSE scripts** in `accela-test`.
-7. **Produce the two companion docs** the user expects for this kind of task (see
+7. **Produce the companion docs** the user expects for this kind of task (see
    [`references/spec-analysis-workflow.md`](references/spec-analysis-workflow.md) for the exact
    format, modeled on prior work in `accela-test/local-notes/`):
    - a **production-config-reference** doc (what's confirmed to already exist, queried from the DB)
    - a **manual-system-actions** doc (what the user must configure/confirm in Accela Admin —
      assignments, missing inspection results, fee item activation, workflow status labels, CRM
      mapping — since none of that is achievable through script/file changes)
-8. **Create a TFS work item per major implementation step** (e.g. add/activate inspection results,
+   - plain-language **explainer doc(s)** with the end-to-end lifecycle diagram, plus a **test
+     cases** doc mapped 1:1 to the normalized behavior
+8. **Consolidate the explainers + test cases into one design-confirmation `.docx`** (see
+   [`references/spec-analysis-workflow.md`](references/spec-analysis-workflow.md) Step 9) and get
+   the requestor to confirm it matches their intent **before** starting the implementation tail
+   end of step 6/7 — this is a distinct, requestor-facing deliverable, not a repackaging of the
+   two docs above (which are dev/admin-only).
+9. **Create a TFS work item per major implementation step** (e.g. add/activate inspection results,
    update workflow tasks/statuses, add an ASI field, script changes per record type, each
    manual-admin action) using [`../tfs-boards/SKILL.md`](../tfs-boards/SKILL.md), parented under
    the item from step 1 — the board should reflect the plan before work starts, not after.
-9. Flag anything you couldn't confirm from the DB (e.g., which user/queue an assignment group
-   resolves to) as an **open decision** rather than guessing.
+10. Flag anything you couldn't confirm from the DB (e.g., which user/queue an assignment group
+    resolves to) as an **open decision** rather than guessing.
 
 ## Manual Admin Steps — Always Check These
 
@@ -159,9 +166,14 @@ learning from doing it go in different places — don't dump everything into one
 - [`references/emse-scripts.md`](references/emse-scripts.md) — event script naming/prefix
   convention and deployment.
 - [`references/spec-analysis-workflow.md`](references/spec-analysis-workflow.md) — how to turn a
-  spec into config-reference + manual-actions + implementation-plan docs.
+  spec into config-reference + manual-actions + implementation-plan docs, plus (Step 9) a
+  requestor-facing design-confirmation `.docx`.
 - [`references/manual-admin-steps-checklist.md`](references/manual-admin-steps-checklist.md) —
   what to flag for the user.
+- [`scripts/render-docx.sh`](scripts/render-docx.sh) — vendored copy of the
+  `accela-spec-normalizer` skill's `.docx` render pipeline, used by Step 9. This is the only thing
+  borrowed from that sibling skill — its diagram-consolidation style and `<gap>` convention are
+  intentionally not used here.
 - [`../sql/SKILL.md`](../sql/SKILL.md) — general T-SQL guidance.
 - [`../tfs-boards/SKILL.md`](../tfs-boards/SKILL.md) — use alongside this skill to update the
   TFS/Azure DevOps board (`tfs.milwaukee.gov`) as spec work progresses: move the card when starting

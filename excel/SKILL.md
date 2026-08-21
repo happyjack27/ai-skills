@@ -71,4 +71,3 @@ See `examples/`.
 ## Related Skills
 
 - [`../shared/coding-standards.md`](../shared/coding-standards.md)
-- [`../data-analysis/SKILL.md`](../data-analysis/SKILL.md)

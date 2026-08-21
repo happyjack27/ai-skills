@@ -72,12 +72,20 @@ The essentials:
 
 1. Confirm the work item type (`Task` for small execution work, `Bug` for a defect, `Product
    Backlog Item` for a larger deliverable) — ask if ambiguous.
-2. `New-TfsWorkItem -Type ... -Fields @{ "System.Title" = ...; "System.Description" = ...;
-   "System.AssignedTo" = "AD\kbaas" }` — **always assign new items to the user** (`AD\kbaas` /
-   "Baas, Kevin") unless explicitly told to assign someone/something else. Don't leave new items
-   unassigned by default.
-   Pass `-ParentId <id>` to link it under a PBI/Feature — `System.Parent` as a plain field does
-   NOT work, see reference doc.
+2. **Before creating a Task, decide its parent PBI/Feature.** A Task that's part of an ongoing
+   initiative (HHMP, DPW migration, etc.) almost always belongs under that initiative's umbrella
+   PBI — search for it (WIQL title match, e.g. `CONTAINS 'Healthy Home'`) rather than skipping the
+   link. Only leave a Task parentless if it's genuinely standalone one-off work with no umbrella —
+   if unsure, ask rather than defaulting to no parent.
+3. `New-TfsWorkItem -Type ... -Fields @{ "System.Title" = ...; "System.Description" = ...;
+   "System.AssignedTo" = "AD\kbaas" } -ParentId <id>` — **always assign new items to the user**
+   (`AD\kbaas` / "Baas, Kevin") unless explicitly told to assign someone/something else. Don't
+   leave new items unassigned by default.
+   `-ParentId` links it under a PBI/Feature — `System.Parent` as a plain field does NOT work, see
+   reference doc. **`-ParentId` is easy to forget because it's optional and the call still
+   succeeds without it** — treat it as required whenever step 2 identified a parent.
+   If a Task was already created without its parent, fix it with
+   `Add-TfsParentLink -Id <taskId> -ParentId <pbiId>` rather than leaving it orphaned or recreating it.
 3. **Keep the description short and plain, like a quick note a person jotted down** — one or two
    sentences of what needs doing and where, not a structured writeup of findings/analysis. Don't
    let it read as AI-generated (no bullet-itemized breakdowns, no "confirmed via X" phrasing) —
@@ -142,6 +150,11 @@ When validating create/update/comment functions against the real board (not just
   1-field case explicitly, not just multi-field.
 - Setting `System.Parent` as a plain field to link a child to a PBI — it's silently ignored; parent
   links need a `relations` patch op (`New-TfsWorkItem -ParentId`).
+- **Creating a Task for ongoing project work without `-ParentId`, leaving it an orphaned card.**
+  Happened live (2026-08-2x, Tasks #561-#563 created under HHMP work with no parent) — `-ParentId`
+  is optional so the call succeeds silently either way, making it easy to just forget. Always
+  decide the parent PBI *before* calling `New-TfsWorkItem` (see "Creating a work item" step 2), and
+  if one slips through anyway, fix it with `Add-TfsParentLink` rather than leaving it dangling.
 - Forgetting to set `System.IterationPath` on a new item — it defaults to the project root, so it
   won't show on any sprint taskboard until explicitly moved into the current sprint (check with
   `$timeframe=current`, don't assume the parent's iteration is the current one).
@@ -169,6 +182,22 @@ When validating create/update/comment functions against the real board (not just
   with `RuleValidationException: ... not in the list of supported values`. Create the item first
   (state defaults to `New`/`To Do`), then call `Update-TfsWorkItemFields` to transition it.
 
+## Weekly Discussion Cadence
+
+**Add a weekly status comment to the main Project Backlog Item** (typically a milestone or umbrella PBI tracking a larger initiative like "HHMP Database Schema" or "DPW Migration Phase 2").
+
+- **Frequency:** At least once per week
+- **Content:** Brief update on progress, blockers, decisions made, or upcoming work
+- **Method:** `Add-TfsWorkItemComment -Id <main-pbi-id> -Text "..."`
+- **Purpose:** Creates a visible narrative on the board; helps new team members catch up; prevents important context from being buried in task comments
+
+**Example:**
+```powershell
+Add-TfsWorkItemComment -Id 123 -Text "Week of 08-20: Created ProjectFiles/ContractorFiles tables (#561, #562), testing in progress. No blockers. Next: Configure UI in KWATControl."
+```
+
+This is especially valuable for long-running initiatives that span multiple sprints or have many sub-tasks.
+
 ## Validation Checklist
 
 - [ ] Confirmed the work item type's legal states before changing `System.State`.
@@ -176,10 +205,15 @@ When validating create/update/comment functions against the real board (not just
 - [ ] Reported back a direct link (`_workitems/edit/{id}`) after creating/updating an item.
 - [ ] Set `System.IterationPath` explicitly if the item needs to appear on a sprint taskboard —
       via a fresh `$timeframe=current` query, not copied from a parent/related item.
+- [ ] Decided the parent PBI *before* creating a Task tied to ongoing work, and passed `-ParentId`
+      at creation — didn't rely on remembering to link it after the fact.
 - [ ] Used `-ParentId` (relations op), not a `System.Parent` field, for parent/child links.
+- [ ] If a Task was found orphaned after creation, linked it with `Add-TfsParentLink` immediately
+      rather than leaving it or the next one unparented too.
 - [ ] Every card is either pure Accela-Admin-console config or pure code/script work, never both —
       if a card's bullets mix "go configure X in Admin" with "edit this .js file", split it.
+- [ ] Added a weekly status comment to any long-running milestone/umbrella PBI at least once per week.
 
 ## Related Skills
 
-- [`../powershell/SKILL.md`](../powershell/SKILL.md) — general PowerShell/cmdlet conventions.
+- [`../shared/coding-standards.md`](../shared/coding-standards.md)

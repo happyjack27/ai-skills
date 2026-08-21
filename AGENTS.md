@@ -49,27 +49,14 @@ update before finishing:
 | Skill | Use for |
 |---|---|
 | `accela` | Accela Civic Platform: EMSE scripts, Automation API, ASI fields, workflows |
-| `aurora` | Aurora platform: config, data model, integrations |
-| `data-analysis` | Profiling, reshaping, and summarizing datasets; data quality checks |
-| `documentation` | READMEs, runbooks, API refs, architecture notes, Mermaid diagrams |
 | `dpw-migration` | City of Milwaukee DPW Oracle → SQL Server migration and query routing |
 | `excel` | Formulas, VBA, Power Query (M), pivot tables |
-| `git` | Branching, rebasing, conflicts, undo (reset/revert/reflog), hooks |
-| `investing` | Asset allocation, fund research, account mechanics. Not financial advice |
 | `java` | JDBC, RMI servers, servlets/JSP, classpath issues, legacy modernization |
-| `javascript` | JS/TS, ES modules, async, DOM, Node.js, npm |
-| `linux` | bash, systemd, cron, permissions, networking, packages |
-| `personal` | This user's standing preferences, workflows, and environment quirks |
-| `powershell` | Cmdlets and pipelines, remoting, running SQL/external tools, admin automation |
-| `python` | Scripting, venvs/packaging, pandas, pytest, type hints |
-| `research` | Investigating unfamiliar topics; source quality; comparing options |
+| `kwatcontrol-ui-config` | KWATControl database (sql-itmd): configuring UI rendering for all MSSQL web apps (KWAT, DPW, HHMP). Add/hide table columns, configure dropdowns, manage reports, sidebar navigation, access grants, and enhancements |
+| `mssql-dynamic-tables` | SQL Server file tables and CRUD generation: development.DynamicFile/DynamicSQUID procs, naming conventions, indexes, foreign keys, delete tracking |
 | `skill-creator` | Creating or updating skills in this library (SKILL.md structure, frontmatter, folders) |
 | `sql` | Queries, DDL, procs, views, indexes, tuning (T-SQL, PG, MySQL, SQLite, Oracle) |
 | `tfs-boards` | tfs.milwaukee.gov "Internal Systems Projects" board: WIQL queries, work item CRUD, board columns |
-| `tools` | VS Code/Eclipse config, CLIs, extensions, AI-assistant customization files |
-| `web` | HTML/CSS, REST design, HTTP semantics, auth flows, browser debugging |
-| `windows` | Services, scheduled tasks, registry, IIS, AD, shares, event logs |
-| `writing` | Emails, status updates, proposals, notices; editing for tone and concision |
 
 `shared/` is not a skill — it holds cross-cutting standards that skills link to.
 

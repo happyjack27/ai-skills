@@ -21,23 +21,10 @@ ai-skills/
 ├── excel/           # Microsoft Excel / VBA / Power Query
 ├── sql/             # SQL (ANSI + dialects)
 ├── java/
-├── python/
-├── javascript/
-├── powershell/
-├── web/             # HTML, CSS, REST APIs
-├── linux/
-├── windows/
-├── git/
-├── documentation/
-├── writing/
-├── research/
-├── data-analysis/
-├── investing/
 ├── accela/          # Accela Civic Platform
-├── aurora/          # Aurora platform
 ├── dpw-migration/   # DPW Oracle (DPWP) to SQL Server migration
-├── personal/        # Personal workflows and preferences
-└── tools/           # Dev tools, IDEs, CLIs
+├── skill-creator/   # Creating/updating skills in this library
+└── tfs-boards/      # tfs.milwaukee.gov Internal Systems Projects board
 ```
 
 Each skill folder contains:

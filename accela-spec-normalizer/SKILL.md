@@ -218,6 +218,15 @@ Do not manufacture findings to look thorough.
 - `assets/templates/tables-blank.md` — blank Tables A–E for analysts filling specs by hand
 - `scripts/render.sh` — renders `.mmd` diagrams to `.svg` (Stage 5)
 - `scripts/render-docx.sh` — consolidates `spec.md` + diagrams into one `.docx` (Stage 6)
+
+## Related skills
+
+- [`../accela/SKILL.md`](../accela/SKILL.md) — the City of Milwaukee's day-to-day Accela spec
+  workflow (grounded in live DB config, EMSE scripts, TFS). Its Step 9 (design-confirmation
+  `.docx`) vendored a copy of `scripts/render-docx.sh` rather than linking to it — that skill
+  deliberately does not use this skill's diagram-consolidation style or `<gap>` convention, so a
+  fix here doesn't automatically apply there; re-check its copy separately if you fix a real bug
+  in this script.
 - `examples/sanitation/` — a complete worked example: loose source in, tables, gaps,
   diagrams, and a consolidated `.docx` out (`diagrams/` holds the working mermaid for
   all three diagram types, plus rationale)

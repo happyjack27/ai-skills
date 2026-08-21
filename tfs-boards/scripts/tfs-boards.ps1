@@ -75,6 +75,20 @@ function New-TfsWorkItem {
         -Body $ops -ContentType "application/json-patch+json"
 }
 
+function Add-TfsParentLink {
+    <#
+      Adds a parent link to an EXISTING work item (retroactive fix for one created without
+      -ParentId). New-TfsWorkItem -ParentId only works at creation time; this covers after-the-fact.
+      Example: Add-TfsParentLink -Id 561 -ParentId 540
+    #>
+    param([Parameter(Mandatory)][int]$Id, [Parameter(Mandatory)][int]$ParentId)
+    $ops = @(@{
+        op = "add"; path = "/relations/-"
+        value = @{ rel = "System.LinkTypes.Hierarchy-Reverse"; url = "$($Script:TfsCollectionUrl)/_apis/wit/workItems/$ParentId" }
+    })
+    Invoke-TfsApi -RelativeUri "wit/workitems/$Id" -Method Patch -Body $ops -ContentType "application/json-patch+json"
+}
+
 function Remove-TfsWorkItem {
     <#
       Deletes a work item. Default is a soft delete (recycle bin, recoverable). Pass -Destroy for

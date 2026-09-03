@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     Creates a directory junction from each agent's personal skill folder to this repo,
-    so every folder here becomes an available skill and new folders appear automatically.
+    so every nested skill here remains available and new skillsets appear automatically.
     Junctions need no admin rights, but require the repo to be on the same volume as
     the user profile. Idempotent: existing correct links are left alone.
 
@@ -48,10 +48,10 @@ foreach ($rel in $Targets) {
 }
 
 # A skill is invisible to discovery without frontmatter, and a name that doesn't match
-# its folder fails silently, so report both rather than let them pass unnoticed.
+# its folder fails silently, so recursively report both rather than let them pass unnoticed.
 Write-Host "`nSkill check:" -ForegroundColor White
-Get-ChildItem $repo -Directory |
-    Where-Object { $_.Name -notin @('.git', 'shared', 'scripts') } |
+Get-ChildItem $repo -Directory -Recurse |
+    Where-Object { $_.FullName -notmatch "\\\.git(\\|$)" -and (Test-Path (Join-Path $_.FullName 'SKILL.md')) } |
     ForEach-Object {
         $skill = Join-Path $_.FullName 'SKILL.md'
         $issue =

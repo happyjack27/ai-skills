@@ -2,13 +2,17 @@
 
 Run through this list for every new/changed record type spec. For each item: **verify first via
 SQL** (read-only, `sql-dev ACCELAPROD`) whether it already exists; only flag it to the user as a
-manual action if it's genuinely missing or ambiguous. Don't ask the user to confirm something you
-can just look up.
+manual action if it's genuinely missing or ambiguous. In other words, the checklist is supposed to
+be the output of database verification, not a substitute for it. Don't ask the user to confirm
+something you can just look up.
 
 ## 1. Assignment / Auto-Assign
 
 - Does the inspection type have `RINSPTYP.AUTO_ASSIGN` set? If the spec assumes auto-assign
   happens and it's not set, that's Admin config, not a script bug.
+- Does the inspection type point at the right inspection group and result group for the record
+  type? Confirm the `RINSPTYP` row matches the intended inspection/abatement split before writing
+  any script logic.
 - What department/individual does a workflow task's default assignment
   (`SPROCESS_DEF.ASGN_*` → `G3DPTTYP`) actually resolve to? Confirm this matches the role name used
   in the spec (e.g. "Sanitation Inspector", "Skid") — the plain-English role name in a spec is not
@@ -42,6 +46,10 @@ can just look up.
   found `PW_SAN_COMP_CV2` shared by 6 Sanitation complaint categories this way. Prefer adding a new
   status label over repurposing an existing one when the process is shared, and call out the
   sharing explicitly in the manual-actions doc so whoever configures it knows the blast radius.
+- Does the script file name / branch name match the exact record-type and workflow names it is
+  meant to own? If the plan says a dedicated record-specific file is needed, the filename and branch
+  conditions should mirror the final inspection/result/status wording so the shared wildcard script
+  can be safely disabled for that record type.
 
 ## 4. Custom Fields (ASI / SmartChoice)
 
@@ -91,3 +99,6 @@ Compile everything flagged here into a numbered "Manual Actions You Will Handle"
 theme, each item phrased as a concrete yes/no confirmation or action (not an open-ended question) —
 match the tone of `construction-material-manual-system-actions.md`. Add a "Findings Used For These
 Manual Actions" section underneath citing what you found in the DB that led to each flag.
+
+Only leave an item in the manual-actions list if the DB lookup actually showed a gap, a mismatch, or
+an ambiguity that needs admin-console work or requestor confirmation.

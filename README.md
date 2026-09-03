@@ -17,17 +17,24 @@ Store AI "skills" as Markdown files — curated prompts, standards, templates, a
 
 ```
 ai-skills/
-├── shared/          # Cross-cutting standards and checklists
-├── excel/           # Microsoft Excel / VBA / Power Query
-├── sql/             # SQL (ANSI + dialects)
-├── java/
-├── accela/          # Accela Civic Platform
-├── dpw-migration/   # DPW Oracle (DPWP) to SQL Server migration
-├── skill-creator/   # Creating/updating skills in this library
-└── tfs-boards/      # tfs.milwaukee.gov Internal Systems Projects board
+├── SKILLSETS.md             # Top-level skillset index
+├── accela-platform/         # Accela Platform Skills
+│   ├── SKILLS.md            # Skill index
+│   └── accela/              # Individual skill
+├── city-systems/            # City Systems Skills
+│   ├── SKILLS.md            # Skill index
+│   └── dpw-migration/       # Individual skill
+├── development-tools/       # Development Tools Skills
+│   ├── SKILLS.md            # Skill index
+│   └── sql/                 # Individual skill
+├── skill-authoring/         # Skill Authoring Skills
+│   ├── SKILLS.md            # Skill index
+│   └── skill-creator/       # Individual skill
+├── shared/                  # Cross-cutting standards and checklists
+└── scripts/                 # Installation and repository tooling
 ```
 
-Each skill folder contains:
+Each individual skill folder contains:
 
 | Path | Purpose |
 |---|---|
@@ -42,10 +49,11 @@ Each skill folder contains:
 
 See [AGENTS.md](AGENTS.md) for the full protocol. In short:
 
-1. Match the task to one or two skills using the index in `AGENTS.md`.
-2. Read that skill's `SKILL.md`.
-3. Open `references/`, `templates/`, or `examples/` only when `SKILL.md` points there.
-4. Read `shared/` only when a skill links to it.
+1. Match the task to a skillset using `SKILLSETS.md`.
+2. Read the skillset's `SKILLS.md`.
+3. Read the selected skill's `SKILL.md`.
+4. Open `references/`, `templates/`, or `examples/` only when `SKILL.md` points there.
+5. Read `shared/` only when a skill links to it.
 
 Mount the whole repo once at your agent's skill directory (e.g. `~/.copilot/skills`,
 `~/.claude/skills`) so every folder is available and new ones appear automatically — see

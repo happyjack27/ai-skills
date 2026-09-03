@@ -1,13 +1,15 @@
 # Contributing
 
-## Adding a New Skill Folder
+## Adding a New Skill
 
-1. Create a folder with a short `kebab-case` name.
-2. Add subdirectories: `archetypes/`, `templates/`, `examples/`, `scripts/`, `references/`.
-3. Copy `shared/SKILL-template.md` to `<folder>/SKILL.md` and fill in every section.
-4. Add YAML frontmatter to the top of `SKILL.md` — `name` must exactly match the folder name,
+1. Choose the appropriate skillset folder, or create a new skillset and add it to `SKILLSETS.md`.
+2. Add the skill folder with a short `kebab-case` name under the skillset.
+3. Add subdirectories: `archetypes/`, `templates/`, `examples/`, `scripts/`, `references/`.
+4. Copy `shared/SKILL-template.md` to `<skillset>/<skill>/SKILL.md` and fill in every section.
+5. Add YAML frontmatter to the top of `SKILL.md` — `name` must exactly match the skill folder name,
    or the skill silently fails to load. See [AGENTS.md](AGENTS.md#authoring-rules).
-5. Place shared rules in `shared/` rather than duplicating them.
+6. Add the skill to the skillset's `SKILLS.md` index.
+7. Place shared rules in `shared/` rather than duplicating them.
 
 ## Editing Existing Files
 

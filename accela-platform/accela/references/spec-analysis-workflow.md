@@ -68,6 +68,12 @@ Using [`database-schema.md`](database-schema.md), pull and record:
 6. **ASI/SmartChoice fields** already defined for the group.
 7. **Fee items** already defined/active that the spec references.
 
+While doing this, keep the names aligned exactly: if the source note uses a business-friendly phrase,
+check whether the real `wfTask`, `wfStatus`, `INSP_TYPE`, or child-record name already exists under
+that exact wording. The dedicated script names and branch conditions should mirror the final exact
+inspection/result/status strings, so a shared wildcard branch can be disabled cleanly for that
+record type.
+
 Write this up as a dated reference doc (see the construction-material example for format): what's
 confirmed to exist today, straight from the database, with no interpretation yet.
 
@@ -94,6 +100,25 @@ generic the name sounds (`"San. Inspection"` turned out to belong to a distinct
 share the same `INSP_CODE` — caught only after scripts were already written and committed against
 it). The record type you're working on needs its own dedicated `INSP_TYPE` — new Admin config, not
 a code fix.
+
+### Pre-Plan Comparison Checklist
+
+Before writing the implementation plan, do one short pass to compare the source note against the
+actual configured names and the nearby sibling implementation. Keep this local and factual:
+
+- Compare the note's inspection names and result names against the live `RINSPTYP` and
+  `RINSP_RESULT_GROUP` values.
+- Compare the note's workflow shape against the actual workflow tasks and status labels in the DB,
+  including any shared process siblings.
+- Compare the record-specific script surface against the shared wildcard script and identify which
+  branches are already generic and which need dedicated files.
+- Compare any business-friendly child-record names in the note against the exact `createChild(...)`
+  and `editAppSpecific(...)` strings already used elsewhere.
+- If the note is clearly asking for a Skid-Violation-style split, note both halves of the change:
+  create the dedicated record-specific EMSE files and disable the overlapping shared-branch logic
+  for that record type.
+- Treat name mismatches as a planning item, not a coding assumption: record them in the running
+  TODO / implementation plan before drafting file-by-file work.
 
 ## Step 5 — Normalize the Requested Behavior
 

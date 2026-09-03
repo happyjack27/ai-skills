@@ -182,6 +182,25 @@ When validating create/update/comment functions against the real board (not just
   with `RuleValidationException: ... not in the list of supported values`. Create the item first
   (state defaults to `New`/`To Do`), then call `Update-TfsWorkItemFields` to transition it.
 
+## Product Backlog Item Content Standards
+
+Assigned project cards must be updated consistently and contain enough detail to support team
+visibility and continuity. This applies to **Product Backlog Items** specifically — it's a higher
+bar than the "short, plain, jotted-note" style used for Task descriptions (see "Creating a work
+item" step 3 above), since a PBI is the umbrella artifact other people rely on to understand an
+initiative without digging through every child Task.
+
+### Description
+- List stakeholders
+- Include relevant details such as websites, server names, and database names
+- Specify a clear end goal
+
+### Acceptance Criteria
+Include a list of criteria that defines a definition of done for the product backlog item.
+
+### Discussion
+Document what was completed, any blockers, and the goal for the next sprint.
+
 ## Weekly Discussion Cadence
 
 **Add a weekly status comment to the main Project Backlog Item** (typically a milestone or umbrella PBI tracking a larger initiative like "HHMP Database Schema" or "DPW Migration Phase 2").
@@ -213,7 +232,12 @@ This is especially valuable for long-running initiatives that span multiple spri
 - [ ] Every card is either pure Accela-Admin-console config or pure code/script work, never both —
       if a card's bullets mix "go configure X in Admin" with "edit this .js file", split it.
 - [ ] Added a weekly status comment to any long-running milestone/umbrella PBI at least once per week.
+- [ ] Product Backlog Item descriptions list stakeholders, relevant details (websites, server
+      names, database names), and a clear end goal.
+- [ ] Product Backlog Items have Acceptance Criteria defining their definition of done.
+- [ ] Product Backlog Item Discussion is kept current: what was completed, blockers, and next
+      sprint's goal.
 
 ## Related Skills
 
-- [`../shared/coding-standards.md`](../shared/coding-standards.md)
+- [`../../shared/coding-standards.md`](../../shared/coding-standards.md)

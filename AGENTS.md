@@ -3,7 +3,8 @@
 Instructions for any AI agent working with — or from — this repository.
 
 This repo is a **skill library**: curated, pre-researched domain knowledge stored as Markdown so
-agents can produce better output with fewer tokens. Each top-level folder is one skill.
+agents can produce better output with fewer tokens. Skillsets group related skills, and each
+individual skill has its own `SKILL.md`.
 
 ## Two Ways Agents Use This Repo
 
@@ -17,8 +18,9 @@ agent loads a skill when a task calls for it. See [Mounting](#mounting).
 
 Load progressively. Never read the whole repo.
 
-1. **Route** — match the task to at most 1–2 skills using the [index](#skill-index). Read only
-   the `description` in each `SKILL.md` frontmatter if you need to disambiguate.
+1. **Route** — match the task to at most 1–2 skills using the [skillset index](#skillset-index)
+  and the selected skillset's `SKILLS.md`. Read only the `description` in each `SKILL.md`
+  frontmatter if you need to disambiguate.
 2. **Load** — read that skill's `SKILL.md` body. This is usually enough.
 3. **Drill down** — read files in `references/`, `templates/`, `archetypes/`, `examples/`, or
    `scripts/` **only** when `SKILL.md` points you to one for the task at hand.
@@ -44,25 +46,20 @@ update before finishing:
 - Do this for genuine repeatable lessons, not one-off trivia. If it's specific to one user's
   environment or a single conversation, it belongs in that agent's own memory system instead.
 
-## Skill Index
+## Skillset Index
 
-| Skill | Use for |
-|---|---|
-| `accela` | Accela Civic Platform: EMSE scripts, Automation API, ASI fields, workflows |
-| `dpw-migration` | City of Milwaukee DPW Oracle → SQL Server migration and query routing |
-| `excel` | Formulas, VBA, Power Query (M), pivot tables |
-| `java` | JDBC, RMI servers, servlets/JSP, classpath issues, legacy modernization |
-| `kwatcontrol-ui-config` | KWATControl database (sql-itmd): configuring UI rendering for all MSSQL web apps (KWAT, DPW, HHMP). Add/hide table columns, configure dropdowns, manage reports, sidebar navigation, access grants, and enhancements |
-| `mssql-dynamic-tables` | SQL Server file tables and CRUD generation: development.DynamicFile/DynamicSQUID procs, naming conventions, indexes, foreign keys, delete tracking |
-| `skill-creator` | Creating or updating skills in this library (SKILL.md structure, frontmatter, folders) |
-| `sql` | Queries, DDL, procs, views, indexes, tuning (T-SQL, PG, MySQL, SQLite, Oracle) |
-| `tfs-boards` | tfs.milwaukee.gov "Internal Systems Projects" board: WIQL queries, work item CRUD, board columns |
+| Skillset | Scope | Index |
+|---|---|---|
+| `accela-platform` | Accela Civic Platform and Crystal Reports | [`accela-platform/SKILLS.md`](accela-platform/SKILLS.md) |
+| `city-systems` | City of Milwaukee systems, services, and database work | [`city-systems/SKILLS.md`](city-systems/SKILLS.md) |
+| `development-tools` | SQL, Java, Excel, TFS, and web application documentation | [`development-tools/SKILLS.md`](development-tools/SKILLS.md) |
+| `skill-authoring` | Creating and maintaining this skill library | [`skill-authoring/SKILLS.md`](skill-authoring/SKILLS.md) |
 
 `shared/` is not a skill — it holds cross-cutting standards that skills link to.
 
 ## Authoring Rules
 
-Every skill folder must contain a `SKILL.md` starting with YAML frontmatter:
+Every individual skill folder must contain a `SKILL.md` starting with YAML frontmatter:
 
 ```yaml
 ---
@@ -77,7 +74,7 @@ description: 'What it covers and when to use it. Keyword-rich. Max 1024 chars.'
   file names — not a vague summary.
 - **Quote descriptions containing a colon**, or the YAML will not parse.
 - Keep `SKILL.md` under ~500 lines. Push detail into `references/` and link to it.
-- Use relative links (`./references/x.md`, `../shared/coding-standards.md`).
+- Use relative links (`./references/x.md`, `../../shared/coding-standards.md`) from nested skill folders.
 - Content should be tool-agnostic: no assumptions about which agent or IDE is reading it.
 
 Structure within a skill folder:
@@ -95,8 +92,9 @@ Start from [`shared/SKILL-template.md`](shared/SKILL-template.md).
 
 ## Mounting
 
-The whole repo is the library, so mount it **once at the root**. Every folder then becomes an
-available skill, and folders added later are picked up automatically.
+The whole repo is the library, so mount it **once at the root**. Skillset folders contain
+`SKILLS.md` indexes, and individual skills are nested below them. Keep the root mount so shared
+references resolve consistently and new skillsets appear automatically.
 
 | Tool | Path to point at this repo |
 |---|---|
@@ -119,11 +117,11 @@ for d in .copilot .claude .agents; do mkdir -p ~/$d && ln -s ~/git/ai-skills ~/$
 ```
 
 A link keeps one source of truth — editing a `SKILL.md` in the repo updates the live skill with
-no sync step. Do not link folders individually: it needs upkeep per skill and breaks
-`../shared/...` links, because `..` is normalized away before the filesystem resolves the link.
+no sync step. Do not link folders individually: it needs upkeep per skillset and breaks
+`../../shared/...` links, because the repository-relative structure is no longer preserved.
 
-Agents without a skill-discovery mechanism can use this file directly: read the
-[index](#skill-index), then open the one `SKILL.md` that matches.
+Agents without a skill-discovery mechanism can use [`SKILLSETS.md`](SKILLSETS.md): read the
+skillset index, open that skillset's `SKILLS.md`, then open the matching `SKILL.md`.
 
 ## Token Discipline
 

@@ -51,13 +51,36 @@ through one of them.
 
 | Table | Rows | Purpose |
 |---|---|---|
-| `DatabaseObjects` | 2 245 | Object catalog: name, schema, type, `source_db`, `is_obsolete` |
+| `DatabaseObjects` | 2 245 | **The** object catalog: name, schema, type, `source_db`, `is_obsolete`. Every FK in the schema (`DbObjectTargetDatabases`, `AppObjectUsage`, `EndpointObjectUsage`, `AppGenericCallUsage`, `DpwpObjectDependencies` x2) points at `DatabaseObjects.object_id` — this is the one to query/join. |
 | `DbObjectTargetDatabases` | 2 156 | Object → target DB, with `migration_status` and `migrated_date` |
 | `TargetDatabases` | 38 | `db_name`, `sql_server` |
-| `DpwpObjects` | 2 206 | Oracle-side object list |
+| `DpwpObjects` | 2 206 | Orphaned raw Oracle object snapshot — **zero incoming foreign keys**, nothing else in the schema joins to it. Looks like a duplicate of `DatabaseObjects` (both show 538 `SEQUENCE` rows for `source_db='DPWP'`) but isn't wired into anything. Don't use it for lookups; it's a leftover, not a second source of truth. |
 | `DpwpObjectDependencies` | 198 | Oracle dependency graph |
 | `TriggerObjectDependencies` | 257 | Trigger → table |
-| `PlacementIssues` | 95 | Objects whose placement is contested or unresolved |
+| `PlacementIssues` | 95+ | Per-**object** placement problems: contested/unresolved target DB |
+| `DatabaseIssues` | new 2026-09-02 | Per-**database** problems that aren't about one object |
+
+`PlacementIssues.issue_type` is a closed enum (`CK_PI_type`) - originally trigger-migration only
+(`AMBIGUOUS_OBJECT_NAME`, `TRIGGER_NOT_MIGRATED`, `MISSING_TRIGGER_DEPENDENCY`,
+`CROSS_DOMAIN_TRIGGER_WRITE`, `TRIGGER_COLOCATION_CONFLICT`). `MISROUTED_TARGET_DB` was added
+2026-09-02 for objects whose `DbObjectTargetDatabases` mapping has no supporting `AppObjectUsage`
+evidence, or where a stray physical copy exists in a database other than the one bookkeeping
+names as authoritative. Adding a new value means `ALTER TABLE ... DROP/ADD CONSTRAINT CK_PI_type`
+with the full list, not just an `INSERT` - the constraint will otherwise reject it (Msg 547).
+`severity`/`status` are also closed enums: `LOW`/`MEDIUM`/`HIGH`, and `open`/`resolved`/`wontfix`.
+
+`DatabaseIssues` (`migration.DatabaseIssues`) is for findings scoped to a whole database rather
+than one object - e.g. "this DB is missing sequences/schemas/expected infrastructure". Columns:
+`id, db_name, issue_type, severity, status, notes, detected_at`. `severity`/`status` reuse the
+same closed-enum values as `PlacementIssues` (`CK_DI_severity`, `CK_DI_status`), but `issue_type`
+is a plain `varchar(40)` with **no** CHECK constraint - deliberately, since database-level issue
+kinds are expected to be more varied than the object-level enum. Row 1: `db_name =
+'SanScaleCenter', issue_type = 'MISSING_SEQUENCES'`, `status = 'open'`, `severity = 'HIGH'` -
+`sys.sequences` is empty in SanScaleCenter, but `SEQ_SAN_SCALE` genuinely exists in Oracle (a user
+confirmed this directly via their own Oracle client after the linked-server checks wrongly reported
+it absent - see SKILL.md Common Mistakes for why). Action needed is a grant, not a shrug: get
+`SELECT` on `SEQ_SAN_SCALE` granted to the `MSSQLSERVER_LINK` login used by the `DPWP` linked
+server, then read `LAST_NUMBER`/`INCREMENT_BY` and create the matching SQL Server `SEQUENCE`.
 
 **RMI**
 

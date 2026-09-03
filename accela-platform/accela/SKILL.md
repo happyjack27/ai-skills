@@ -82,10 +82,17 @@ Before assuming a spec describes brand-new work, check whether `ACCELATEST` alre
    [`references/database-schema.md`](references/database-schema.md): record type row, workflow
    tasks, inspection types + result sets + auto-assign flags, ASI (SmartChoice) fields, fee items.
    Don't guess at existing result values, task names, or fee codes — look them up.
+  - Verify the inspection type's `AUTO_ASSIGN` flag and target group/result-group wiring, and keep
+    the script names / branch names aligned with the exact inspection, result, task, and status
+    strings that exist in the DB.
 4. **Read the existing scripts** for this record type and any wildcard (`~`) parent scripts that
    also fire for it, in `accela-test/Scripts/Event/`. See
    [`references/emse-scripts.md`](references/emse-scripts.md) for the naming/prefix convention and
    which scripts fire on which events.
+  - Before drafting the plan, use the pre-plan comparison checklist in
+    [`references/spec-analysis-workflow.md`](references/spec-analysis-workflow.md) to compare the
+    source note against the live inspection names/results, sibling record types, and any shared
+    vs. dedicated script branches.
 5. **Normalize the spec** against that baseline — note what already exists vs. what's new (new
    inspection result, new fee code, new workflow status, new ASI field, new CRM mapping).
 6. **Write/update the EMSE scripts** in `accela-test`.
@@ -180,4 +187,4 @@ learning from doing it go in different places — don't dump everything into one
   a phase, add a comment summarizing what was found/changed, and move it to done once implemented
   and deployed — don't let the implementation-plan doc's phase tracking be the only place status
   lives.
-- [`../shared/coding-standards.md`](../shared/coding-standards.md)
+- [`../../shared/coding-standards.md`](../../shared/coding-standards.md)

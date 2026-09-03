@@ -56,4 +56,4 @@ See `examples/`.
 
 ## Related Skills
 
-- [`../shared/coding-standards.md`](../shared/coding-standards.md)
+- [`../../shared/coding-standards.md`](../../shared/coding-standards.md)

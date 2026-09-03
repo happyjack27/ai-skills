@@ -41,14 +41,19 @@ Help an AI write, optimize, and explain SQL queries and schema changes.
 ## Workflow
 
 1. Confirm the dialect and schema.
-2. Write the query with clear formatting (one clause per line, uppercase keywords).
+2. Write the query with the formatting rules below.
 3. Explain any non-obvious joins, window functions, or CTEs.
 4. Suggest indexes if a performance issue is apparent.
 
 ## Quality Standards
 
 - Keywords uppercase: `SELECT`, `FROM`, `WHERE`, `JOIN`, `ON`.
-- Each clause on its own line; indent continuation lines 4 spaces.
+- Keep clause keywords flush left: `FROM`, `JOIN`, `LEFT JOIN`, `ON 1 = 1`, and `WHERE 1 = 1`.
+- Put each table name on its own line immediately below `FROM` or a `JOIN` clause.
+- Use `ON 1 = 1` for multi-predicate joins, then indent each join predicate with tabs.
+- Use `WHERE 1 = 1` for multi-predicate filters, then indent each filter predicate with tabs.
+- Use tabs for SQL indentation; do not replace aligned predicate indentation with spaces.
+- Put continuation expressions and predicates on separate lines, with one logical condition per line.
 - Use CTEs (`WITH`) over nested subqueries for readability.
 - Always use explicit `JOIN` syntax — never implicit comma joins.
 - Include a `WHERE` clause on UPDATE/DELETE; note when a full-table operation is intentional.
@@ -71,8 +76,8 @@ Help an AI write, optimize, and explain SQL queries and schema changes.
 
 ## Examples
 
-See `examples/`.
+Read [`examples/sql-format.md`](examples/sql-format.md) for the required clause and indentation layout. See the other files in `examples/` for dialect and query-pattern examples.
 
 ## Related Skills
 
-- [`../shared/coding-standards.md`](../shared/coding-standards.md)
+- [`../../shared/coding-standards.md`](../../shared/coding-standards.md)

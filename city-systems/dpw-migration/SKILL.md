@@ -164,6 +164,60 @@ Three separate switches must agree; see
 - **A wrong routing decision and a failed connection to the resolved DB are different failures.**
   `migration.RoutingFallbackLog` only records the routing decision, never whether the connection
   actually succeeded — check the target server's `xp_readerrorlog` for login failures separately.
+- **`DbObjectTargetDatabases` can itself be wrong.** Found in `SanScaleCenter`: `CCURE` and
+  `SAN_BILLING_LOOKUP` are mapped there with zero corroborating `AppObjectUsage` rows for any app;
+  `SAN_CART_SURVEY`, `NPPS`, `NPPS_CHECK`, `PARKING_REGS2` are correctly mapped to `CallCenter` in
+  bookkeeping but a stray physical copy also sits in `SanScaleCenter` and was being silently
+  reloaded by `syncDatabase` every run. Don't trust a `DbObjectTargetDatabases` row just because it
+  exists — cross-check `AppObjectUsage`/`vw_AppObjectAccess`, and check what tables are *physically
+  present* in the database against what bookkeeping says should be there. Log confirmed
+  misroutes/duplicates as `PlacementIssues.issue_type = 'MISROUTED_TARGET_DB'`.
+- **Not every finding is about one object.** `migration.DatabaseIssues` (added 2026-09-02) holds
+  database-scoped findings not tied to a single object (e.g. a whole database missing an expected
+  category of object). Use this table instead of forcing a database-level gap into `PlacementIssues`,
+  which is object-scoped. See [database-migration-db.md](./references/database-migration-db.md).
+- **Oracle sequence naming convention: `SEQ_<TABLE_NAME>`.** When migrating a table, check whether
+  Oracle has a matching sequence backing its PK/watermark column before assuming one needs to be
+  created. **But an empty result from the linked server does NOT prove the sequence doesn't
+  exist** — this bit us on 2026-09-02: `ALL_SEQUENCES` and `ALL_OBJECTS WHERE OWNER = 'DPW'` via
+  `OPENQUERY([DPWP], '...')` both returned zero rows for `SEQ_SAN_SCALE`/`SEQ_SAN_CART_SURVEY`/etc,
+  and that was wrongly reported as "confirmed absent." Both views are **grant-scoped to the
+  linked-server login** (`MSSQLSERVER_LINK`), not schema-scoped — a table's owner having rows in
+  `ALL_OBJECTS` doesn't mean every object that owner has is visible, only the ones the link login
+  was separately granted privilege on. The sequences existed the whole time; a human with a
+  properly-privileged Oracle client could see them immediately. **The real check**: query
+  `SELECT TABLE_NAME, GRANTOR, PRIVILEGE FROM USER_TAB_PRIVS_RECD WHERE TABLE_NAME LIKE 'SEQ_%'`
+  (self-referential, not privilege-gated, always accessible) to see exactly what the link login has
+  been granted. Zero rows there means "no visibility through this link," not "doesn't exist" — you
+  cannot enumerate what you don't have grants on. If you need to confirm true absence/existence and
+  the link comes up empty, ask someone with direct Oracle access (or request the grant) rather than
+  trusting the linked server's silence. `DBA_SEQUENCES`/`DBA_OBJECTS` are typically not accessible
+  to a migration-scoped linked-server login either (Msg 7321, insufficient privilege).
+  **Update 2026-09-02: this specific gap was closed** — an Oracle-side grant was added for
+  `MSSQLSERVER_LINK`, and a plain `OPENQUERY([DPWP], 'SELECT ... FROM ALL_SEQUENCES')` with **no
+  impersonation** now returns `SEQ_SAN_CART_SURVEY`/`SEQ_SAN_SCALE` (confirmed via
+  `SELECT USER FROM DUAL` = `MSSQLSERVER_LINK`). If this resurfaces for a different object, the fix
+  is the same: request the grant, don't reach for `EXECUTE AS` or a SQL Agent job.
+  **Do not `SELECT OWNER`** as an output column in any `OPENQUERY` against these Oracle dictionary
+  views — it makes the OLE DB provider fail to prepare the query at all (Msg 7321), even though
+  `OWNER` is a normal column and filtering by it in `WHERE` works fine.
+- **A SQL Agent job does NOT escalate you to a linked server's `sa`-mapped Oracle account, even
+  though `EXECUTE AS LOGIN = 'sa'` fails (Msg 7303) and a job looks like a workaround.** `sys.linked_logins`
+  on `DPWP` maps the *virtual* account `NT SERVICE\SQLSERVERAGENT` to Oracle `system`, but a
+  sysadmin-owned T-SQL job step actually runs as the real Windows/domain account the Agent service
+  logs in as (here, a domain account, confirmed via `sysjobhistory.message` = "Executed as user:
+  AD\SQLSERVERAGENT") — a *different* login than the virtual-account name in `sys.linked_logins`.
+  With no mapping for that specific domain login, the linked server silently falls back to the
+  default/public mapping (`MSSQLSERVER_LINK` — the same restricted account you started with).
+  **Always verify with `SELECT USER FROM DUAL` via the job's own `OPENQUERY` before trusting any
+  "elevated" result** — a job "succeeding" only means the T-SQL ran without error, not that it ran
+  as the Oracle account you expected. If you need genuine elevated Oracle access and the linked
+  server has no working escalation path, the fastest real fix is asking someone with a directly
+  privileged Oracle client to run the query and share results — don't keep inventing SQL Server-side
+  workarounds for what is fundamentally an Oracle-side grants gap. Once the grant is actually added,
+  the fix shows up as the *default* (unimpersonated) `OPENQUERY` starting to work — `EXECUTE AS
+  LOGIN = 'sa'` still fails with Msg 7303 regardless, since that's a separate provider limitation,
+  not a grants problem. Don't bother re-testing impersonation after a grant fix; just query plainly.
 - **A database's credentials can go stale in two places at once.** `GenericServer` has its own
   hardcoded legacy password fallback (`getDBPassword()`/`mssql_password_PROD`) that is completely
   separate from `db-connections.properties`/`ConnectionRegistry`. Changing one does not change the
@@ -203,4 +257,4 @@ Three separate switches must agree; see
 
 - [`../sql/SKILL.md`](../sql/SKILL.md)
 - [`../java/SKILL.md`](../java/SKILL.md)
-- [`../shared/coding-standards.md`](../shared/coding-standards.md)
+- [`../../shared/coding-standards.md`](../../shared/coding-standards.md)

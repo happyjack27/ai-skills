@@ -143,6 +143,11 @@ When validating create/update/comment functions against the real board (not just
 
 - Assuming a PAT is required — it isn't, on this on-prem instance with Windows auth enabled.
 - Calling the comments endpoint with the core `6.0` api-version — it 404s; needs `6.0-preview.3`.
+- **PowerShell rejects a `foreach` statement followed directly by a pipeline** such as
+  `foreach (...) { ... } | ConvertTo-Json` with "An empty pipe element is not allowed." When
+  collecting results from several TFS calls, initialize `$out = @()`, append each object inside
+  the loop, then pipe `$out` after the loop. If a query behaves unexpectedly, run one minimal
+  request and inspect its raw response before adding loops or projections.
 - Sending update bodies as a plain JSON object instead of a JSON Patch array — Azure DevOps work
   item create/update always expects `application/json-patch+json` with `{op, path, value}` entries.
 - **Single-field JSON Patch calls silently 400** unless the request body is forced to stay a JSON
@@ -199,20 +204,25 @@ initiative without digging through every child Task.
 Include a list of criteria that defines a definition of done for the product backlog item.
 
 ### Discussion
-Document what was completed, any blockers, and the goal for the next sprint.
+Keep it human and brief: one to three short sentences, usually under 50 words. Say what changed
+and what happens next; mention a blocker only when there is one. Do not force a weekly-report
+template into every comment, repeat the title, or summarize every child task. Report the outcome,
+not the keystrokes: omit routine implementation details such as fixing a brace mismatch,
+renaming a variable, or correcting a typo unless they materially change scope, risk, or delivery.
 
 ## Weekly Discussion Cadence
 
 **Add a weekly status comment to the main Project Backlog Item** (typically a milestone or umbrella PBI tracking a larger initiative like "HHMP Database Schema" or "DPW Migration Phase 2").
 
 - **Frequency:** At least once per week
-- **Content:** Brief update on progress, blockers, decisions made, or upcoming work
+- **Content:** A brief, conversational update on the most meaningful progress and next step;
+  include a blocker or decision only when it matters
 - **Method:** `Add-TfsWorkItemComment -Id <main-pbi-id> -Text "..."`
 - **Purpose:** Creates a visible narrative on the board; helps new team members catch up; prevents important context from being buried in task comments
 
 **Example:**
 ```powershell
-Add-TfsWorkItemComment -Id 123 -Text "Week of 08-20: Created ProjectFiles/ContractorFiles tables (#561, #562), testing in progress. No blockers. Next: Configure UI in KWATControl."
+Add-TfsWorkItemComment -Id 123 -Text "The new tables are in and basic testing looks good. Next I’m wiring them into KWATControl."
 ```
 
 This is especially valuable for long-running initiatives that span multiple sprints or have many sub-tasks.

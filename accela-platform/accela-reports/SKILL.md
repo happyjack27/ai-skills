@@ -30,7 +30,8 @@ Use this skill when a request involves any of the following:
 7. Use tabs for SQL indentation in report drafts so aligned predicates stay easy to move with copy and paste.
 8. Put report-specific derived values in the SQL with a clear output alias so Crystal can reference them as command fields; reserve Crystal formulas for layout-only behavior.
 9. Refer to [`examples/report-sql-format.md`](examples/report-sql-format.md) when drafting or revising report SQL.
-10. Verify the output against the sample record and call out any value that is still guessed, hard-coded, or not yet confirmed in the database.
+10. Run the finished SQL in SSMS against every sample ALT_ID supplied by the report template or request, replacing the Crystal parameter with the exact literal for the test. Confirm that the query returns the expected row and compare every highlighted/template value field-by-field against the document before creating Crystal tags.
+11. Call out any value that is still guessed, hard-coded, or not yet confirmed in the database. Do not finalize the Crystal field map until ambiguous identifiers, such as a permit number versus an `ACA temp Record #` custom field, are resolved against the sample output.
 
 ## Grounding Rules
 
@@ -57,6 +58,8 @@ Keep these failure modes explicit so they are not repeated.
 - Confirm which fields are summary-page values, which are finance values, and which are ASI values before assembling the final SQL.
 - Treat missing ASI rows as a data question, not a cue to invent a value.
 - Recheck one known example record such as `VAC-21-00498` after each rewrite so the report stays anchored to the same case.
+- Treat template confirmation as an executable check: run each report query for every record number shown in the Word/text source documents, compare owner mailing address, property address, date, identifier, and status-specific values to the document, and record any mismatch before handing the query to Crystal.
+- Do not assume a displayed `Re:` identifier is the Accela permit number or an `ACA temp Record #`; select both when the source is ambiguous and resolve which one matches the template's sample value in SSMS.
 
 ## Common Report Sources
 

@@ -166,6 +166,6 @@ VALUES (@RoleID, @TableID, 1, 1, 1, 1);
 
 ## Links & Related Skills
 
-- **mssql-dynamic-tables** — for managing file attachment tables (ProjectFile, ContractorFile)
+- [`mssql-dynamic-tables`](../../mssql-dynamic-tables/SKILL.md) — for managing file attachment tables (ProjectFile, ContractorFile)
 - **sql** — general SQL query help
 - **java** — for understanding how web apps read KWATControl at runtime

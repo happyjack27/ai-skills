@@ -52,7 +52,9 @@ update before finishing:
 | Skillset | Scope | Index |
 |---|---|---|
 | `accela-platform` | Accela Civic Platform and Crystal Reports | [`accela-platform/SKILLS.md`](accela-platform/SKILLS.md) |
-| `city-systems` | City of Milwaukee systems, services, and database work | [`city-systems/SKILLS.md`](city-systems/SKILLS.md) |
+| `citytime-workday` | CityTime, Workday, and DPW employee/time-labor integration | [`citytime-workday/SKILLS.md`](citytime-workday/SKILLS.md) |
+| `dpw-migration` | DPW Oracle-to-SQL Server migration and production cutover | [`dpw-migration/SKILLS.md`](dpw-migration/SKILLS.md) |
+| `kwat-webapps` | KWAT web application services, UI metadata, and dynamic tables | [`kwat-webapps/SKILLS.md`](kwat-webapps/SKILLS.md) |
 | `development-tools` | SQL, Java, Excel, TFS, and web application documentation | [`development-tools/SKILLS.md`](development-tools/SKILLS.md) |
 | `skill-authoring` | Creating and maintaining this skill library | [`skill-authoring/SKILLS.md`](skill-authoring/SKILLS.md) |
 

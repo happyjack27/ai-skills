@@ -1,5 +1,5 @@
 ---
-name: dpw-migration
+name: migration-operations
 description: 'Use for the City of Milwaukee DPW Oracle (DPWP) to SQL Server migration: reloading/refreshing a migrated table or database from live Oracle via syncTable/syncSequence/syncDatabase, deciding which SQL Server database a table/RMI method/servlet page should route to, looking up app-to-database mappings in the DatabaseMigration bookkeeping DB, blocking or auditing writes to already-migrated Oracle tables, diagnosing wrong-database routing bugs in MSSQL-converted RMI servers (GenericServer/RoutingChecker/DPWConnectionFactory), and any work under DPW_Includes_DataServer_MSSQL/sql/.'
 ---
 

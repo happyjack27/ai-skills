@@ -29,9 +29,9 @@ Help an AI write, optimize, and explain SQL queries and schema changes.
 
 **Use a specialized skill instead when:**
 
-- The work is DPW Oracle-to-SQL Server migration routing, cutover, or refresh: use [`../../city-systems/dpw-migration/SKILL.md`](../../city-systems/dpw-migration/SKILL.md).
-- The work uses `development.DynamicFile` or `development.DynamicSQUID` for standardized file tables: use [`../../city-systems/mssql-dynamic-tables/SKILL.md`](../../city-systems/mssql-dynamic-tables/SKILL.md).
-- The work configures KWATControl UI metadata: use [`../../city-systems/kwatcontrol-ui-config/SKILL.md`](../../city-systems/kwatcontrol-ui-config/SKILL.md).
+- The work is DPW Oracle-to-SQL Server migration routing, cutover, or refresh: use [`../../dpw-migration/migration-operations/SKILL.md`](../../dpw-migration/migration-operations/SKILL.md).
+- The work uses `development.DynamicFile` or `development.DynamicSQUID` for standardized file tables: use [`../../kwat-webapps/mssql-dynamic-tables/SKILL.md`](../../kwat-webapps/mssql-dynamic-tables/SKILL.md).
+- The work configures KWATControl UI metadata: use [`../../kwat-webapps/kwatcontrol-ui-config/SKILL.md`](../../kwat-webapps/kwatcontrol-ui-config/SKILL.md).
 - The work changes Accela record types, workflows, or event scripts: use the relevant skill under [`../../accela-platform/`](../../accela-platform/).
 
 **Pair with:**

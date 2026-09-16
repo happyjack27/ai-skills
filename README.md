@@ -21,9 +21,15 @@ ai-skills/
 ├── accela-platform/         # Accela Platform Skills
 │   ├── SKILLS.md            # Skill index
 │   └── accela/              # Individual skill
-├── city-systems/            # City Systems Skills
+├── citytime-workday/        # CityTime/Workday skillset
 │   ├── SKILLS.md            # Skill index
-│   └── dpw-migration/       # Individual skill
+│   └── workday-citytime-integration/ # Action skill
+├── dpw-migration/           # DPW migration skillset
+│   ├── SKILLS.md            # Skill index
+│   └── migration-operations/ # Action skill
+├── kwat-webapps/            # KWAT webapps skillset
+│   ├── SKILLS.md            # Skill index
+│   └── kwat-services/       # Action skills
 ├── development-tools/       # Development Tools Skills
 │   ├── SKILLS.md            # Skill index
 │   └── sql/                 # Individual skill

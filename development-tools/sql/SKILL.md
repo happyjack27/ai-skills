@@ -21,6 +21,23 @@ Help an AI write, optimize, and explain SQL queries and schema changes.
 - User needs query optimization or an execution plan review.
 - User needs data migration or transformation logic in SQL.
 
+## Routing Boundaries
+
+**Use this skill when:**
+
+- The request is generic SQL, DDL, DML, or performance work without a stronger domain-specific workflow.
+
+**Use a specialized skill instead when:**
+
+- The work is DPW Oracle-to-SQL Server migration routing, cutover, or refresh: use [`../../city-systems/dpw-migration/SKILL.md`](../../city-systems/dpw-migration/SKILL.md).
+- The work uses `development.DynamicFile` or `development.DynamicSQUID` for standardized file tables: use [`../../city-systems/mssql-dynamic-tables/SKILL.md`](../../city-systems/mssql-dynamic-tables/SKILL.md).
+- The work configures KWATControl UI metadata: use [`../../city-systems/kwatcontrol-ui-config/SKILL.md`](../../city-systems/kwatcontrol-ui-config/SKILL.md).
+- The work changes Accela record types, workflows, or event scripts: use the relevant skill under [`../../accela-platform/`](../../accela-platform/).
+
+**Pair with:**
+
+- A domain-specific skill when SQL is only one part of a migration, application, or metadata change.
+
 ## Inputs Expected
 
 | Input | Description |

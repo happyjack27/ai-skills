@@ -1,7 +1,7 @@
 # Accela Platform Skills
 
-| Skill | Use for |
-|---|---|
-| [`accela`](accela/SKILL.md) | Accela Civic Platform configuration, EMSE scripts, workflows, inspections, fees, and integrations |
-| [`accela-reports`](accela-reports/SKILL.md) | Accela Crystal Reports, report SQL, templates, and field maps |
-| [`accela-spec-normalizer`](accela-spec-normalizer/SKILL.md) | Normalizing Accela record type, workflow, inspection, fee, and script specifications |
+| Skill | Use when | Do not choose for |
+|---|---|---|
+| [`accela`](accela/SKILL.md) | Accela configuration, EMSE scripts, workflows, inspections, fees, or integrations | Crystal report layout/SQL or normalizing a loose specification |
+| [`accela-reports`](accela-reports/SKILL.md) | Building or grounding Accela Crystal Reports, report SQL, templates, or field maps | General Accela configuration or record-type normalization |
+| [`accela-spec-normalizer`](accela-spec-normalizer/SKILL.md) | Turning loose Accela record/workflow/inspection/fee specs into tables, gap lists, and diagrams | Implementing the resulting scripts or reports |

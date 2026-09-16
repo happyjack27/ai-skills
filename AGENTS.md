@@ -18,8 +18,9 @@ agent loads a skill when a task calls for it. See [Mounting](#mounting).
 
 Load progressively. Never read the whole repo.
 
-1. **Route** — match the task to at most 1–2 skills using the [skillset index](#skillset-index)
-  and the selected skillset's `SKILLS.md`. Read only the `description` in each `SKILL.md`
+1. **Route** — read `SKILLSETS.md`, then the relevant skillset's `SKILLS.md`, and match the task
+  to at most 1–2 skills using those indexes.
+  Use `SKILL-CATALOG.json` only for broad or automated searches. Read only the `description` in each `SKILL.md`
   frontmatter if you need to disambiguate.
 2. **Load** — read that skill's `SKILL.md` body. This is usually enough.
 3. **Drill down** — read files in `references/`, `templates/`, `archetypes/`, `examples/`, or
@@ -75,6 +76,7 @@ description: 'What it covers and when to use it. Keyword-rich. Max 1024 chars.'
 - **Quote descriptions containing a colon**, or the YAML will not parse.
 - Keep `SKILL.md` under ~500 lines. Push detail into `references/` and link to it.
 - Use relative links (`./references/x.md`, `../../shared/coding-standards.md`) from nested skill folders.
+- Include `Routing Boundaries` with distinctive use conditions, exclusions, and paired skills.
 - Content should be tool-agnostic: no assumptions about which agent or IDE is reading it.
 
 Structure within a skill folder:

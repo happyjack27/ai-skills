@@ -37,6 +37,23 @@ resolved by the language server).
   deciding whether to add code to a shared `Abstract*API` class or a domain/servlet layer
 - Debugging why a request parameter isn't showing up where expected
 
+## Routing Boundaries
+
+**Use this skill when:**
+
+- The code imports or extends the `future_package_layout` servlet, request-context, JSON, or REST-client framework.
+- The task concerns `CoreServices3`, `ServiceData2`, `JsonMap`, `AbstractRestApi`, or the shared API-facade pattern.
+
+**Use the Java skill instead when:**
+
+- The task is generic Java, JDBC, classpath, build, or language work without this framework's conventions.
+- The task is business logic specific to one application; use this skill only for the shared servlet or REST plumbing.
+
+**Pair with:**
+
+- [`../kwatcontrol-ui-config/SKILL.md`](../kwatcontrol-ui-config/SKILL.md) when a servlet change also consumes or updates KWATControl UI metadata.
+- [`../../accela-platform/accela/SKILL.md`](../../accela-platform/accela/SKILL.md) for Accela-specific API behavior or record/workflow semantics.
+
 ## Key Conventions
 
 ### `CoreServices3` (base servlet)
@@ -133,5 +150,5 @@ resolved by the language server).
 
 ## Related Skills
 
-- [`../accela/SKILL.md`](../accela/SKILL.md) — for the Accela Civic Platform side of integrations
+- [`../../accela-platform/accela/SKILL.md`](../../accela-platform/accela/SKILL.md) — for the Accela Civic Platform side of integrations
   built on `AbstractAccelaAPI`/`AccelaAPO`.

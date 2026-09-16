@@ -78,7 +78,7 @@ easy to get wrong, and invisible at the call site unless you read the method nam
 ## 3. Which Environment — the `Database` enum, not a config file
 
 This is the part most often misread. The environment is compiled in, at
-[`util/dbConnections/enums/Database.java`](../../DPW_Includes_DataServer_MSSQL/src/util/dbConnections/enums/Database.java):
+[`util/dbConnections/enums/Database.java`](../../../../DPW_Includes_DataServer_MSSQL/src/util/dbConnections/enums/Database.java):
 
 ```java
 GISDPW            ("GISDPW",            DbEnvironment.PROD),
@@ -113,7 +113,7 @@ and regardless of the page's `USE_MSSQL` flag. Promoting a database to productio
 edit plus a rebuild — not a config change, not a restart.
 
 Credentials come from
-[`resources/db-connections.properties`](../../DPW_Includes_DataServer_MSSQL/resources/db-connections.properties),
+[`resources/db-connections.properties`](../../../../DPW_Includes_DataServer_MSSQL/resources/db-connections.properties),
 keyed `<DbName>.<env>.user` / `<DbName>.<env>.password`, where `<DbName>` is exactly
 `Database.getDbName()`. Servers are *not* in that file.
 

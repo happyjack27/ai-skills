@@ -32,7 +32,7 @@ the end.
 
 ## 2. The end-to-end record lifecycle (target state)
 
-![lifecycle diagram](diagrams/workflow-lifecycle.png)
+<!-- Add diagrams/workflow-lifecycle.png when the lifecycle diagram is produced. -->
 
 <!-- Plain-language step-by-step walkthrough, same content/order as the workflow explainer. -->
 

@@ -107,7 +107,7 @@ so explicitly and mark the row `pending_deploy` (see below) rather than `fixed`.
 ## Recording resolution status — `migration.CheckerQueryFix`
 
 `migration.CheckerQueryFix` (see
-[`../../../DPW_Includes_DataServer_MSSQL/sql/create_CheckerQueryFix.sql`](../../../DPW_Includes_DataServer_MSSQL/sql/create_CheckerQueryFix.sql))
+[`../../../../DPW_Includes_DataServer_MSSQL/sql/create_CheckerQueryFix.sql`](../../../../DPW_Includes_DataServer_MSSQL/sql/create_CheckerQueryFix.sql))
 joins to `vCheckerQuerySummary` on `query_hash` and carries a `resolution_type`.
 
 **Grain matters here**: `CheckerQueryLog` is one row per *execution* (115k+ rows and

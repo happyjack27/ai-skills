@@ -28,7 +28,7 @@
    ```
 4. Hard refresh browser (Ctrl+Shift+R) to see it.
 
-**See:** [add-contractor-columns.md](../examples/add-contractor-columns.md)
+**See:** [add-contractor-columns.md](examples/add-contractor-columns.md)
 
 ---
 
@@ -52,7 +52,7 @@
    ```
 3. Hard refresh browser to see dropdown values.
 
-**See:** [dropdowns-and-lookups.md](../examples/dropdowns-and-lookups.md)
+**See:** [dropdowns-and-lookups.md](examples/dropdowns-and-lookups.md)
 
 ---
 
@@ -89,7 +89,7 @@ VALUES (3, 42, 123, 0);  -- Role 3 cannot read column 123
 2. Tell users to hard-refresh: **Ctrl+Shift+R** (Windows) or **Cmd+Shift+R** (Mac)
 3. If still not working after hard-refresh, request admin to restart the servlet.
 
-**See:** [cache-invalidation.md](../references/cache-invalidation.md)
+**See:** [cache-invalidation.md](references/cache-invalidation.md)
 
 ---
 

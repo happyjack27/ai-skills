@@ -16,9 +16,9 @@ Oracle originals after cutover.
 - **In scope:** the `DatabaseMigration` bookkeeping DB, the `syncTable`/`syncSequence`/`syncDatabase`
   refresh procedures, the Oracle-side `MIGRATIONS` freeze schema, RMI method → target-DB routing,
   and cutover sequencing.
-- **Out of scope:** general SQL authoring (see [`../sql/SKILL.md`](../sql/SKILL.md)), Java servlet
-  and RMI server code (see [`../java/SKILL.md`](../java/SKILL.md)), Accela specifics
-  (see [`../accela/SKILL.md`](../accela/SKILL.md)).
+- **Out of scope:** general SQL authoring (see [`../../development-tools/sql/SKILL.md`](../../development-tools/sql/SKILL.md)), Java servlet
+  and RMI server code (see [`../../development-tools/java/SKILL.md`](../../development-tools/java/SKILL.md)), Accela specifics
+  (see [`../../accela-platform/accela/SKILL.md`](../../accela-platform/accela/SKILL.md)).
 
 ## When to Use
 
@@ -78,6 +78,7 @@ The essentials:
 | Fact | Value |
 |---|---|
 | Migration/staging SQL Server | `sql-treas` — full access, Oracle client installed |
+| Migration procedure template | `sql-treas._DPWMigrationTemplate` — canonical template containing the migration refresh procedures and `dbo.IncrementalSyncConfig`; no application data belongs here |
 | Production SQL Server | `sql-dpw3` — **not** sysadmin, **no Oracle provider** |
 | Oracle source | 19c, database `DPWP`, all objects owned by schema `DPW` |
 | Linked server | `DPWP` on `sql-treas` only — always via `OPENQUERY` |
@@ -89,7 +90,9 @@ The essentials:
 ### Refreshing data from Oracle
 
 1. Connect to the **target** database on `sql-treas` — the procedures are deployed into every
-   target DB and deliberately contain no `USE` statement.
+  target DB and deliberately contain no `USE` statement. `_DPWMigrationTemplate` is the
+  procedure/configuration template, not a normal application target; use it as the baseline when
+  provisioning or repairing a target database.
 2. Preview first: `EXEC syncTable @Object='ROADLIFE', @WhatIf=1` returns the generated batch
    without running it.
 3. Run it. For a whole database, `EXEC syncDatabase` loops every table then syncs sequences once.
@@ -131,6 +134,13 @@ Three separate switches must agree; see
 - Refresh procedures run **in the target database**; never add a `USE` statement to them.
 - Stage `OPENQUERY` results into a `#temp` **outside** the transaction to avoid MSDTC promotion.
 - Leave PK and UNIQUE indexes enforcing during a load so bad Oracle data fails loudly.
+- Before a production cutover, verify the migrated SQL Server table still has the expected
+  nonclustered indexes as well; do not assume a successful data reload recreated them all.
+  If the source Oracle table had an index and the target table does not, treat that as a go-live
+  blocker until it is reconciled.
+- `syncDatabase` now calls `dbo.syncMissingOracleIndexes` after each table load so the SQL Server
+  table keeps the Oracle source's index/key coverage. Use the helper directly if you need to
+  repair one table without rerunning the full database sync.
 - Only disable objects that are currently enabled, and restore them inside the same transaction.
 - Deliver Oracle DDL as a reviewable file; it cannot be executed or tested from the workstation.
 - Verify a claim against the database before asserting it — both servers hold surprises
@@ -233,6 +243,8 @@ Three separate switches must agree; see
 - [ ] Oracle access goes through `OPENQUERY`, not three-part naming.
 - [ ] `@WhatIf=1` reviewed before a real reload of a production-bound table.
 - [ ] Row counts compared before and after; skipped columns explained.
+- [ ] Indexes compared against the source Oracle table or the expected target index list; no
+  missing production indexes remain.
 - [ ] Triggers, constraints, and indexes confirmed re-enabled after a load.
 - [ ] Before any freeze: audit run, `V_STILL_WRITING` empty, shared tables excluded.
 - [ ] No Oracle object left `INVALID`.
@@ -255,6 +267,6 @@ Three separate switches must agree; see
 
 ## Related Skills
 
-- [`../sql/SKILL.md`](../sql/SKILL.md)
-- [`../java/SKILL.md`](../java/SKILL.md)
+- [`../../development-tools/sql/SKILL.md`](../../development-tools/sql/SKILL.md)
+- [`../../development-tools/java/SKILL.md`](../../development-tools/java/SKILL.md)
 - [`../../shared/coding-standards.md`](../../shared/coding-standards.md)

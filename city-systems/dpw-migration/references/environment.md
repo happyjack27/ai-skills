@@ -32,6 +32,23 @@ Other linked servers on `sql-treas`: `CORPDB` (Oracle), `ORA2` (Oracle), `sql-rp
 | `migration.DbObjectTargetDatabases` | Per-object migration status |
 | `migration.vRmiEndpointTargetDB` | RMI interface/method → target DB (authoritative) |
 
+## Migration Procedure Template
+
+`_DPWMigrationTemplate` on `sql-treas` is the canonical SQL Server template for the DPW Oracle
+→ SQL Server refresh tooling. It contains the current migration procedures and the incremental
+sync configuration table, but no application data should be placed there. Use it as the baseline
+when provisioning or repairing a target database; run the procedures against the actual target
+database that owns the migrated tables.
+
+The template contains:
+
+- `dbo.syncTable`
+- `dbo.syncTableIncremental`
+- `dbo.syncSequence`
+- `dbo.syncDatabase`
+- `dbo.syncMissingOracleIndexes`
+- `dbo.IncrementalSyncConfig`
+
 ## Schema Facts (verified)
 
 - **Zero foreign keys** in any migrated database. Only two check constraints, both in `DPWP`.
@@ -68,8 +85,10 @@ Other linked servers on `sql-treas`: `CORPDB` (Oracle), `ORA2` (Oracle), `sql-rp
 
 ## Procedure Signatures
 
-All three are deployed into **every** target database on `sql-treas` (33 databases plus `DPWP`),
-never into `DatabaseMigration`, and contain no `USE` statement.
+The five procedures are deployed into **every** target database on `sql-treas`, as well as
+`_DPWMigrationTemplate` and `DPWP`; they are never deployed into `DatabaseMigration`, and contain
+no `USE` statement. `_DPWMigrationTemplate` is the canonical copy to use when comparing or
+refreshing a target database's procedure definitions.
 
 ```sql
 EXEC syncTable    @Object='ROADLIFE', @WhatIf=1;   -- preview the generated batch
@@ -80,8 +99,33 @@ EXEC syncDatabase @WhatIf=1;                       -- every table, then sequence
 `syncTable` copies name-matched columns only, stages into `#temp`, then truncates and reloads
 inside one transaction with `TABLOCK`. It disables and restores only currently-enabled triggers,
 sets constraints `NOCHECK` and re-enables them `WITH CHECK`, optionally rebuilds non-unique
-nonclustered indexes (`@RebuildIndexes=1`), and updates statistics after commit. PK and UNIQUE
-indexes stay enforcing on purpose.
+nonclustered indexes (enabled by default; pass `@RebuildIndexes=0` only when intentionally
+leaving them online), and updates statistics after commit. PK and UNIQUE indexes stay enforcing
+on purpose.
+
+If the source Oracle table had indexes, confirm the target SQL Server table has the same
+production-relevant index coverage after the reload. A quick sanity check on the target is:
+
+```sql
+SELECT i.name, i.type_desc, i.is_primary_key, i.is_unique, i.is_disabled
+FROM sys.indexes i
+WHERE i.object_id = OBJECT_ID('DPW.CALL_CENTER')
+  AND i.index_id > 0
+ORDER BY i.is_primary_key DESC, i.is_unique DESC, i.name;
+```
+
+Use that output to compare against the Oracle source or the expected index list before go-live.
+Missing nonclustered indexes are a release blocker on large tables, even if the data reload itself
+completed successfully.
+
+`syncDatabase` now invokes `dbo.syncMissingOracleIndexes` after each table load to repair any
+missing Oracle indexes, unique constraints, or eligible one-column keys on the SQL Server copy.
+You can run it directly for a single table when you want to repair structure without reloading the
+data again:
+
+```sql
+EXEC dbo.syncMissingOracleIndexes @Schema = 'DPW', @Table = 'SAN_SCALE';
+```
 
 ## Oracle Freeze Schema
 

@@ -18,6 +18,20 @@ _What is included? What is explicitly out of scope?_
 - _Trigger condition 1_
 - _Trigger condition 2_
 
+## Routing Boundaries
+
+**Use this skill instead of nearby skills when:**
+
+- _Distinctive task, technology, or source-of-truth condition_
+
+**Do not use this skill when:**
+
+- _Neighboring task that belongs to another skill_
+
+**Pair with:**
+
+- _Related skill and the reason to load it_
+
 ## Inputs Expected
 
 | Input | Description |
@@ -56,4 +70,4 @@ See `examples/`.
 
 ## Related Skills
 
-- [`../../shared/coding-standards.md`](../../shared/coding-standards.md)
+- [`coding-standards.md`](coding-standards.md)

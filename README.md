@@ -49,11 +49,15 @@ Each individual skill folder contains:
 
 See [AGENTS.md](AGENTS.md) for the full protocol. In short:
 
-1. Match the task to a skillset using `SKILLSETS.md`.
-2. Read the skillset's `SKILLS.md`.
+1. Read `SKILLSETS.md` and choose the most relevant skillset.
+2. Read that skillset's `SKILLS.md` and select at most 1–2 candidates.
 3. Read the selected skill's `SKILL.md`.
 4. Open `references/`, `templates/`, or `examples/` only when `SKILL.md` points there.
 5. Read `shared/` only when a skill links to it.
+
+`SKILL-CATALOG.json` is an optional machine-readable index for broad or automated searches. It is
+not part of the normal routing path; reading the small indexes top down is usually more token
+efficient.
 
 Mount the whole repo once at your agent's skill directory (e.g. `~/.copilot/skills`,
 `~/.claude/skills`) so every folder is available and new ones appear automatically — see

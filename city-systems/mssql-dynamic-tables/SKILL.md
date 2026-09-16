@@ -30,6 +30,22 @@ Help an AI generate standardized file-storage tables and CRUD procedures on SQL 
 - User is validating that file tables have correct naming, indexes, and foreign keys.
 - User needs CRUD procedures for a file table without writing manual proc DDL.
 
+## Routing Boundaries
+
+**Use this skill when:**
+
+- Creating or modifying a SQL Server file-storage table through `development.DynamicFile` and `development.DynamicSQUID`.
+- Generating the standard CRUD procedures, indexes, foreign keys, triggers, or delete tracking for that file-table pattern.
+
+**Use the SQL skill instead when:**
+
+- Writing general SQL queries or DDL for lookup, reporting, metadata, or other non-file tables.
+
+**Pair with:**
+
+- [`../../development-tools/sql/SKILL.md`](../../development-tools/sql/SKILL.md) for general SQL validation.
+- [`../kwatcontrol-ui-config/SKILL.md`](../kwatcontrol-ui-config/SKILL.md) when the new file table also needs UI metadata.
+
 ## Inputs Expected
 
 | Input | Description | Example |
@@ -199,5 +215,5 @@ See `examples/`.
 
 ## Related Skills
 
-- [`../sql/SKILL.md`](../sql/SKILL.md) — General SQL query/DDL work.
-- [`../java/SKILL.md`](../java/SKILL.md) — JDBC code that calls these CRUD procs.
+- [`../../development-tools/sql/SKILL.md`](../../development-tools/sql/SKILL.md) — General SQL query/DDL work.
+- [`../../development-tools/java/SKILL.md`](../../development-tools/java/SKILL.md) — JDBC code that calls these CRUD procs.

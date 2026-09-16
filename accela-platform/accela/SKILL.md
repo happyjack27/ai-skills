@@ -112,7 +112,7 @@ Before assuming a spec describes brand-new work, check whether `ACCELATEST` alre
    two docs above (which are dev/admin-only).
 9. **Create a TFS work item per major implementation step** (e.g. add/activate inspection results,
    update workflow tasks/statuses, add an ASI field, script changes per record type, each
-   manual-admin action) using [`../tfs-boards/SKILL.md`](../tfs-boards/SKILL.md), parented under
+  manual-admin action) using [`../../development-tools/tfs-boards/SKILL.md`](../../development-tools/tfs-boards/SKILL.md), parented under
    the item from step 1 — the board should reflect the plan before work starts, not after.
 10. Flag anything you couldn't confirm from the DB (e.g., which user/queue an assignment group
     resolves to) as an **open decision** rather than guessing.
@@ -181,8 +181,8 @@ learning from doing it go in different places — don't dump everything into one
   `accela-spec-normalizer` skill's `.docx` render pipeline, used by Step 9. This is the only thing
   borrowed from that sibling skill — its diagram-consolidation style and `<gap>` convention are
   intentionally not used here.
-- [`../sql/SKILL.md`](../sql/SKILL.md) — general T-SQL guidance.
-- [`../tfs-boards/SKILL.md`](../tfs-boards/SKILL.md) — use alongside this skill to update the
+- [`../../development-tools/sql/SKILL.md`](../../development-tools/sql/SKILL.md) — general T-SQL guidance.
+- [`../../development-tools/tfs-boards/SKILL.md`](../../development-tools/tfs-boards/SKILL.md) — use alongside this skill to update the
   TFS/Azure DevOps board (`tfs.milwaukee.gov`) as spec work progresses: move the card when starting
   a phase, add a comment summarizing what was found/changed, and move it to done once implemented
   and deployed — don't let the implementation-plan doc's phase tracking be the only place status

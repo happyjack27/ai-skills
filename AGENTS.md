@@ -57,8 +57,9 @@ update before finishing:
 | `kwat-webapps` | KWAT web application services, UI metadata, and dynamic tables | [`kwat-webapps/SKILLS.md`](kwat-webapps/SKILLS.md) |
 | `development-tools` | SQL, Java, Excel, TFS, and web application documentation | [`development-tools/SKILLS.md`](development-tools/SKILLS.md) |
 | `skill-authoring` | Creating and maintaining this skill library | [`skill-authoring/SKILLS.md`](skill-authoring/SKILLS.md) |
+| `shared` | Cross-cutting shared skills and guidance | [`shared/SKILLS.md`](shared/SKILLS.md) |
 
-`shared/` is not a skill — it holds cross-cutting standards that skills link to.
+`shared/` holds cross-cutting guidance and shared skills that are indexed in `shared/SKILLS.md`.
 
 ## Authoring Rules
 

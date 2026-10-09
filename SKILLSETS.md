@@ -8,5 +8,6 @@
 | `kwat-webapps` | KWAT web application services, UI metadata, and dynamic tables | [Skills](kwat-webapps/SKILLS.md) |
 | `development-tools` | SQL, Java, Excel, TFS, and web application documentation | [Skills](development-tools/SKILLS.md) |
 | `skill-authoring` | Creating and maintaining this skill library | [Skills](skill-authoring/SKILLS.md) |
+| `shared` | Cross-cutting shared skills and guidance | [Skills](shared/SKILLS.md) |
 
-Shared cross-cutting guidance remains in [`shared/`](shared/), and repository tooling remains in [`scripts/`](scripts/).
+Shared cross-cutting guidance and skills remain in [`shared/`](shared/), and repository tooling remains in [`scripts/`](scripts/).

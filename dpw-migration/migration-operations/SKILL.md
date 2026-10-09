@@ -174,6 +174,14 @@ Three separate switches must agree; see
 - **A wrong routing decision and a failed connection to the resolved DB are different failures.**
   `migration.RoutingFallbackLog` only records the routing decision, never whether the connection
   actually succeeded — check the target server's `xp_readerrorlog` for login failures separately.
+- **Staggered apps sharing an Oracle sequence cannot use local `MAX(key)` for the later import.**
+  When one SanScale house moves first, reserve a SQL-only `SEQ_SAN_SCALE` range above Oracle's
+  current `LAST_NUMBER`, persist the Oracle `REC_NUM` floor from the initial sync, then merge the
+  later house by its `SITE_ID` and that saved floor. `syncTableIncremental` normally uses local
+  `MAX(REC_NUM)`, which includes the first house's reserved SQL IDs and would skip the second
+  house's lower Oracle IDs. Do not run `syncDatabase`/`syncSequence` after the reservation: they
+  reset the SQL sequence back to Oracle. Re-import a small overlap and locally open tickets;
+  reject any incoming `REC_NUM` that already belongs to a different site.
 - **`DbObjectTargetDatabases` can itself be wrong.** Found in `SanScaleCenter`: `CCURE` and
   `SAN_BILLING_LOOKUP` are mapped there with zero corroborating `AppObjectUsage` rows for any app;
   `SAN_CART_SURVEY`, `NPPS`, `NPPS_CHECK`, `PARKING_REGS2` are correctly mapped to `CallCenter` in

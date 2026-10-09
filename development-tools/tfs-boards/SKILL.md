@@ -189,6 +189,9 @@ When validating create/update/comment functions against the real board (not just
 
 ## Product Backlog Item Content Standards
 
+Use the copy-ready [project card update template](templates/project-card-update-template.md)
+when creating or refreshing a project card and its supporting Tasks.
+
 Assigned project cards must be updated consistently and contain enough detail to support team
 visibility and continuity. This applies to **Product Backlog Items** specifically — it's a higher
 bar than the "short, plain, jotted-note" style used for Task descriptions (see "Creating a work

@@ -2,7 +2,11 @@
 
 ## System boundary
 
-The Workday-facing CityTime application is `DPW_CitytimeSSO`. The checked-in project is a Java 8 desktop Swing application. The SQL schema and legacy CityTime code use PeopleSoft-style `PS_` table names even though the source data is described as Workday/Time and Labor data.
+The Workday-facing transfer program is `DPW_Citytime_Workday_Integration`. It is an Eclipse Java
+project that reads and writes CSV files in mounted transfer folders and calls CityTime database
+procedures/views. `DPW_CitytimeSSO` is a separate Java 8 desktop Swing application for Microsoft
+Entra ID sign-in. The SQL schema and legacy CityTime code use PeopleSoft-style `PS_` table names
+even though the source data is described as Workday/Time and Labor data.
 
 The primary target database is SQL Server `CityTime`. The source-side schema referenced by the crew mapping utility is `tandl`.
 

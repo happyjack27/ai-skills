@@ -15,6 +15,12 @@ Standards that apply across all programming skill folders.
 - One blank line between logical blocks; two between top-level definitions.
 - Remove trailing whitespace.
 
+## Abstraction
+
+- Keep one-use logic inline unless it hides substantial complexity or marks a meaningful boundary.
+- Extract a helper when it has at least three real call sites or clearly isolates complex, reusable behavior.
+- Do not create or lengthen methods just to satisfy an arbitrary line-count rule; optimize for clear control flow.
+
 ## Comments
 
 - Comment *why*, not *what*.

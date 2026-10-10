@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: Guide for creating effective skills. This skill should be used when users want to create or update a skill that extends an AI agent with specialized knowledge, workflows, or tool integrations.
+description: 'Create, update, organize, validate, or package AI skills. Covers SKILL.md frontmatter, progressive loading, resource selection, routing indexes, and catalog maintenance.'
 license: Complete terms in LICENSE.txt
 ---
 
@@ -8,19 +8,11 @@ license: Complete terms in LICENSE.txt
 
 This skill provides guidance for creating effective skills for any compatible AI agent.
 
-## About Skills
+## Routing Boundaries
 
-Skills are modular, self-contained packages that extend an AI agent's capabilities by providing
-specialized knowledge, workflows, and tools. Think of them as "onboarding guides" for specific
-domains or tasks—they transform a general-purpose agent into a specialized agent
-equipped with procedural knowledge that no model can fully possess.
-
-### What Skills Provide
-
-1. Specialized workflows - Multi-step procedures for specific domains
-2. Tool integrations - Instructions for working with specific file formats or APIs
-3. Domain expertise - Company-specific knowledge, schemas, business logic
-4. Bundled resources - Scripts, references, and assets for complex and repetitive tasks
+- Use for authoring, organizing, validating, or packaging skills, not ordinary domain work.
+- Follow [CONTRIBUTING.md](../../CONTRIBUTING.md) for repository conventions and
+  [AGENTS.md](../../AGENTS.md) for loading behavior.
 
 ### Anatomy of a Skill
 
@@ -90,20 +82,8 @@ To create a skill, follow the "Skill Creation Process" in order, skipping steps 
 
 ### Step 1: Understanding the Skill with Concrete Examples
 
-Skip this step only when the skill's usage patterns are already clearly understood. It remains valuable even when working with an existing skill.
-
-To create an effective skill, clearly understand concrete examples of how the skill will be used. This understanding can come from either direct user examples or generated examples that are validated with user feedback.
-
-For example, when building an image-editor skill, relevant questions include:
-
-- "What functionality should the image-editor skill support? Editing, rotating, anything else?"
-- "Can you give some examples of how this skill would be used?"
-- "I can imagine users asking for things like 'Remove the red-eye from this image' or 'Rotate this image'. Are there other ways you imagine this skill being used?"
-- "What would a user say that should trigger this skill?"
-
-To avoid overwhelming users, avoid asking too many questions in a single message. Start with the most important questions and follow up as needed for better effectiveness.
-
-Conclude this step when there is a clear sense of the functionality the skill should support.
+Identify concrete requests, expected outputs, and exclusions. Skip clarification when usage is
+already clear; otherwise ask only questions that affect scope.
 
 ### Step 2: Planning the Reusable Skill Contents
 
@@ -131,11 +111,7 @@ To establish the skill's contents, analyze each concrete example to create a lis
 
 ### Step 3: Initializing the Skill
 
-At this point, it is time to actually create the skill.
-
-Skip this step only if the skill being developed already exists, and iteration or packaging is needed. In this case, continue to the next step.
-
-When creating a new skill from scratch, always run the `init_skill.py` script. The script conveniently generates a new template skill directory that automatically includes everything a skill requires, making the skill creation process much more efficient and reliable.
+Initialize new skills with `init_skill.py`; skip this step for existing skills.
 
 Usage from this repository:
 
@@ -154,7 +130,8 @@ After initialization, customize or remove the generated SKILL.md and example fil
 
 ### Step 4: Edit the Skill
 
-When editing the (newly-generated or existing) skill, remember that the skill is being created for another instance of Claude to use. Focus on including information that would be beneficial and non-obvious to Claude. Consider what procedural knowledge, domain-specific details, or reusable assets would help another Claude instance execute these tasks more effectively.
+Write for any compatible agent. Include non-obvious procedural knowledge, domain facts, and
+decision rules; omit generic explanations the agent can already supply.
 
 #### Start with Reusable Skill Contents
 
@@ -172,9 +149,21 @@ To complete SKILL.md, answer the following questions:
 2. When should the skill be used?
 3. In practice, how should an agent use the skill? Reference all reusable skill contents so the agent knows when and how to use them.
 
-### Step 5: Packaging a Skill
+Use the [skill template](../../shared/SKILL-template.md); retain only useful sections.
+Link each resource with a condition for opening it. Add routing exclusions and paired skills.
 
-Once the skill is ready, it should be packaged into a distributable zip file that gets shared with the user. The packaging process automatically validates the skill first to ensure it meets all requirements:
+Update the skillset's `SKILLS.md` and, for a new skillset, `SKILLSETS.md`. When moving skills,
+remove obsolete copies and repair incoming links. From the repository root, run:
+
+```bash
+python scripts/generate-catalog.py
+python scripts/validate-skills.py
+```
+
+### Step 5: Packaging a Skill (Only When Requested)
+
+Package only when a distributable archive is requested. The packager validates frontmatter first;
+repository validation above is still needed for links, indexes, and catalog consistency:
 
 ```bash
 python skill-authoring/skill-creator/scripts/package_skill.py <path/to/skill-folder>
@@ -191,12 +180,14 @@ The packaging script will:
 1. **Validate** the skill automatically, checking:
    - YAML frontmatter format and required fields
    - Skill naming conventions and directory structure
-   - Description completeness and quality
-   - File organization and resource references
+   - Required metadata
 
 2. **Package** the skill if validation passes, creating a zip file named after the skill (e.g., `my-skill.zip`) that includes all files and maintains the proper directory structure for distribution.
 
 If validation fails, the script will report the errors and exit without creating a package. Fix any validation errors and run the packaging command again.
+
+Check links to shared or sibling skills before distributing a standalone ZIP: files outside the
+skill folder are not bundled and must remain available to the consumer.
 
 ### Step 6: Iterate
 
@@ -204,6 +195,7 @@ After testing the skill, users may request improvements. Often this happens righ
 
 **Iteration workflow:**
 1. Use the skill on real tasks
+   and check a neighboring non-match to verify routing exclusions.
 2. Notice struggles or inefficiencies
 3. Identify how SKILL.md or bundled resources should be updated
 4. Implement changes and test again

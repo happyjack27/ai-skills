@@ -3,7 +3,7 @@
 ## Adding a New Skill
 
 1. Choose the appropriate skillset folder, or create a new skillset and add it to `SKILLSETS.md`.
-2. Add the skill folder with a short `kebab-case` name under the skillset.
+2. Choose a short `kebab-case` skill name; let the initializer create its folder under the skillset.
 3. Initialize with `python skill-authoring/skill-creator/scripts/init_skill.py <skill-name> --path <skillset>`.
 4. Use `shared/SKILL-template.md` to shape the entry point; remove generated placeholders and
    unused folders. Keep only sections and resources that help the task.

@@ -3,14 +3,16 @@
 ## Adding a New Skill
 
 1. Choose the appropriate skillset folder, or create a new skillset and add it to `SKILLSETS.md`.
-2. Add the skill folder with a short `kebab-case` name under the skillset.
-3. Add subdirectories: `archetypes/`, `templates/`, `examples/`, `scripts/`, `references/`.
-4. Copy `shared/SKILL-template.md` to `<skillset>/<skill>/SKILL.md` and fill in every section.
-5. Add YAML frontmatter to the top of `SKILL.md` — `name` must exactly match the skill folder name,
+2. Choose a short `kebab-case` skill name; let the initializer create its folder under the skillset.
+3. Initialize with `python skill-authoring/skill-creator/scripts/init_skill.py <skill-name> --path <skillset>`.
+4. Use `shared/SKILL-template.md` to shape the entry point; remove generated placeholders and
+   unused folders. Keep only sections and resources that help the task.
+5. Complete YAML frontmatter at the top of `SKILL.md` — `name` must exactly match the skill folder name,
    or the skill silently fails to load. See [AGENTS.md](AGENTS.md#authoring-rules).
-6. Add `Routing Boundaries` when a neighboring skill could plausibly be selected for the same request.
+6. Include `Routing Boundaries`: distinctive triggers, exclusions, and useful paired skills.
 7. Add the skill to the skillset's `SKILLS.md` index.
-8. Regenerate `SKILL-CATALOG.json` and run `python scripts/validate-skills.py`.
+8. If moving or renaming a skill, remove its obsolete entry and update all incoming links.
+   Regenerate `SKILL-CATALOG.json` and run `python scripts/validate-skills.py`.
 9. Place shared rules in `shared/` rather than duplicating them.
 
 ## Editing Existing Files
@@ -18,6 +20,9 @@
 - Keep files concise — every sentence should earn its place.
 - Prefer bullet points over prose for AI readability.
 - Use fenced code blocks with language tags for all code samples.
+- Keep routing in indexes, task workflow in `SKILL.md`, and deep detail in linked resources.
+- Link each resource with a condition for opening it; do not require loading whole directories.
+- Preserve verified domain facts when shortening text; remove duplication, not useful evidence.
 
 ## Commit Messages
 
@@ -28,6 +33,7 @@ Example: `excel: add VLOOKUP archetype`
 
 - `kebab-case.md` for all Markdown files.
 - `SKILL.md` is always uppercase (entry point convention).
+- Repository and skillset indexes retain their existing uppercase names.
 
 ## Catalog and Validation
 

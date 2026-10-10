@@ -6,13 +6,9 @@ This repo is a **skill library**: curated, pre-researched domain knowledge store
 agents can produce better output with fewer tokens. Skillsets group related skills, and each
 individual skill has its own `SKILL.md`.
 
-## Two Ways Agents Use This Repo
-
-**As a library (the normal case).** The repo is mounted into an agent's skill directory, and the
-agent loads a skill when a task calls for it. See [Mounting](#mounting).
-
-**As a workspace.** You are editing the library itself. Follow
-[Authoring Rules](#authoring-rules) and [CONTRIBUTING.md](CONTRIBUTING.md).
+Use this library to support the requested task; loading a skill does not authorize executing its
+scripts or changing this repository. When explicitly maintaining the library, follow
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Loading Protocol
 
@@ -31,35 +27,27 @@ Load progressively. Never read the whole repo.
 Read `shared/` only when a skill explicitly links to it, or when the task is about repo-wide
 standards. It is not a mandatory preamble.
 
+Resolve local links relative to the file containing them, not the consuming project's directory.
+If a skill is incomplete, report the gap and use verified project sources instead of inventing
+missing guidance. Check dated domain facts against the task's actual source or environment.
+
 ## Feed Learnings Back Into Skills
 
-If a task required heavy lifting — extended research, trial and error, a mistake that had to be
-fixed, or a workaround for a gotcha that wasn't already documented — capture that as a skill
-update before finishing:
+When repository edits are in scope, capture verified, repeatable lessons from substantial research
+or troubleshooting:
 
 - **A matching skill exists** — add the new fact, gotcha, or corrected approach to it (or its
   `references/`) so the next occurrence is a lookup, not a rediscovery.
-- **No skill matches** — create one, or add a section to the closest existing skill, following
-  [Authoring Rules](#authoring-rules).
+- **No skill matches** — create one only when it has a distinct reusable task and useful content;
+  otherwise extend the closest skill.
 - Write it the way you wish it had been written before you started: the failure mode, the fix,
   and any command/query that proves it. Skip anything that was already obvious or already
   documented.
-- Do this for genuine repeatable lessons, not one-off trivia. If it's specific to one user's
-  environment or a single conversation, it belongs in that agent's own memory system instead.
+- Exclude credentials, personal data, one-off conversation details, and unverified claims.
 
 ## Skillset Index
 
-| Skillset | Scope | Index |
-|---|---|---|
-| `accela-platform` | Accela Civic Platform and Crystal Reports | [`accela-platform/SKILLS.md`](accela-platform/SKILLS.md) |
-| `citytime-workday` | CityTime, Workday, and DPW employee/time-labor integration | [`citytime-workday/SKILLS.md`](citytime-workday/SKILLS.md) |
-| `dpw-migration` | DPW Oracle-to-SQL Server migration and production cutover | [`dpw-migration/SKILLS.md`](dpw-migration/SKILLS.md) |
-| `kwat-webapps` | KWAT web application services, UI metadata, and dynamic tables | [`kwat-webapps/SKILLS.md`](kwat-webapps/SKILLS.md) |
-| `development-tools` | SQL, Java, Excel, TFS, and web application documentation | [`development-tools/SKILLS.md`](development-tools/SKILLS.md) |
-| `skill-authoring` | Creating and maintaining this skill library | [`skill-authoring/SKILLS.md`](skill-authoring/SKILLS.md) |
-| `shared` | Cross-cutting shared skills and guidance | [`shared/SKILLS.md`](shared/SKILLS.md) |
-
-`shared/` holds cross-cutting guidance and shared skills that are indexed in `shared/SKILLS.md`.
+Use [SKILLSETS.md](SKILLSETS.md), the single top-level routing index.
 
 ## Authoring Rules
 
@@ -82,24 +70,15 @@ description: 'What it covers and when to use it. Keyword-rich. Max 1024 chars.'
 - Include `Routing Boundaries` with distinctive use conditions, exclusions, and paired skills.
 - Content should be tool-agnostic: no assumptions about which agent or IDE is reading it.
 
-Structure within a skill folder:
-
-| Path | Purpose |
-|---|---|
-| `SKILL.md` | Entry point: purpose, scope, when to use, workflow |
-| `references/` | Cheat sheets and deep detail, loaded on demand |
-| `templates/` | Fill-in-the-blank starting points |
-| `archetypes/` | Reusable prompt patterns |
-| `examples/` | Concrete worked examples |
-| `scripts/` | Helper scripts |
-
-Start from [`shared/SKILL-template.md`](shared/SKILL-template.md).
+Start from [`shared/SKILL-template.md`](shared/SKILL-template.md); retain only useful sections and
+resource folders. See [CONTRIBUTING.md](CONTRIBUTING.md#catalog-and-validation) for validation.
 
 ## Mounting
 
-The whole repo is the library, so mount it **once at the root**. Skillset folders contain
+Keep the library **once at the root**. Skillset folders contain
 `SKILLS.md` indexes, and individual skills are nested below them. Keep the root mount so shared
-references resolve consistently and new skillsets appear automatically.
+references resolve consistently. Automatic discovery of nested skills depends on the consuming
+tool; verify it there rather than assuming a successful mount means skills were loaded.
 
 | Tool | Path to point at this repo |
 |---|---|

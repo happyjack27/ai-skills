@@ -1,9 +1,11 @@
-# SKILL.md Template
-
-Copy this file to a new skill folder and fill in each section.  
-Delete sections that don't apply; add domain-specific sections as needed.
-
 ---
+name: replace-with-folder-name
+description: 'Replace with concrete tasks, technologies, and trigger words. Maximum 1024 characters.'
+---
+
+# Skill Title
+
+_Replace all placeholders; delete optional sections and unused resources._
 
 ## Purpose
 
@@ -64,10 +66,7 @@ _What is included? What is explicitly out of scope?_
 - [ ] _Check 1_
 - [ ] _Check 2_
 
-## Examples
+## Resources
 
-See `examples/`.
-
-## Related Skills
-
-- [`coding-standards.md`](coding-standards.md)
+_Link only existing files, relative to this skill. State when each should be opened.
+Keep long examples and reference detail out of the entry point._

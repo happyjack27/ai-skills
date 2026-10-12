@@ -6,16 +6,26 @@ description: 'This skill should be used to retrieve persistent Global or Project
 # Use ai-memory
 
 Use the ai-memory Markdown repository for evidence-backed knowledge and task
-state. Keep procedures in AI-Skills and facts/checkpoints in ai-memory.
+state. Keep domain procedures in AI-Skills and facts/checkpoints in ai-memory;
+the memory repository owns its canonical lifecycle and memory workflow templates.
+
+## Routing Boundaries
+
+- Use for persistent knowledge retrieval, recording, checkpointing, resumption,
+  promotion, and memory setup with a configured ai-memory checkout.
+- Pair with the relevant domain skill for implementation; memory supplies
+  evidence and task state, not replacement coding procedures.
+- Use session-history tools for past conversations. Do not use memory as a
+  transcript store or infer always-on instruction discovery from skill loading.
 
 ## Locate and retrieve
 
-1. Resolve the root from user configuration or activating instructions. On this
-   machine, use `C:\Users\kbaas\git\ai-memory` unless overridden; ask if no root
-   is configured elsewhere. Report inaccessible memory; never create a silent
-   replacement.
+1. Resolve the root from user configuration or activating instructions; ask if
+   no root is configured. Report inaccessible memory; never guess a machine
+   path or create a silent replacement.
 2. Read `MEMORY.md`, `global\MEMORY.md`, and `projects\PROJECTS.md`.
-   Match the current repository root or verified alias, not its basename.
+   Match verified repository identity or a registered local root/explicit alias,
+   not a basename. Repository identity allows retrieval across machines.
 3. Read the matching project's `MEMORY.md` and `working\WORKING.md`, then only
    relevant notes/checkpoints. Do not scan the whole tree or unrelated archives.
 4. Recheck change-sensitive facts against current source, schemas, or tests.
@@ -50,9 +60,11 @@ document set for every project.
    fact; mark unverified hypotheses provisional and invalidated facts stale.
    Advance verification dates only after checking evidence. Obtain confirmation
    before generalizing project policy or personal preferences globally.
-4. On resume, reconcile the checkpoint with current instructions, source,
-   branch, and worktree. Ask if several tasks fit; preserve unrelated edits and
-   avoid replaying successful side effects or failed approaches blindly.
+4. On explicit resume, read `docs\lifecycle.md`'s resume/finish policy before
+   choosing an action. Reconcile current instructions, source, branch, worktree,
+   and environment. Ask if several tasks fit; preserve unrelated edits and
+   machine-specific blockers. Do not replay successful side effects or failed
+   approaches blindly.
 5. Mark done only after acceptance is verified. Promote useful findings, archive
    terminal checkpoints, fix links, and remove their active routing rows.
 

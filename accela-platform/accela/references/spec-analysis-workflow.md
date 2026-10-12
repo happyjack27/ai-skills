@@ -6,6 +6,9 @@ projects/` (see `construction-material-prod-config-reference.md`,
 for a real worked example) — reuse this structure for new spec work unless the user asks for
 something different.
 
+Confirm the source checkout and target environment first. Paths below use the
+usual `accela-test` workflow; use the confirmed checkout if the task differs.
+
 ## Step 0 — Save the Raw Spec + Start a Running TODO File
 
 Before analysis starts, save the spec as given (verbatim, or a faithful text extraction if it
@@ -26,12 +29,10 @@ manual-system-actions doc once analysis is complete, but starts life as this scr
 
 Before diving into DB research, create (or confirm there already is) a TFS work item that
 represents fleshing this spec out into concrete action items — using
-[`../../../development-tools/tfs-boards/SKILL.md`](../../../development-tools/tfs-boards/SKILL.md). This tracks the *analysis/planning*
-once an implementation plan exists.
-
-  once the plan is known. This item covers "figure out what the plan even is."
-  titled something like "Analyze <spec name> and produce implementation plan" is enough — it isn't
-  meant to be broken down further until Step 8.
+[`../../../development-tools/tfs-boards/SKILL.md`](../../../development-tools/tfs-boards/SKILL.md).
+This tracks analysis/planning before an implementation plan exists. A title such
+as "Analyze <spec name> and produce implementation plan" is enough; create the
+separate execution cards in Step 10 once the plan is known.
 
 ## Step 2 — Pin Down the Record Type(s) Involved
 
@@ -42,14 +43,12 @@ casing/spelling used elsewhere (`R1_APP_TYPE_ALIAS` vs. the 4-part key can diffe
 
 ## Step 3 — Query the Baseline Config (produces a "prod-config-reference" doc)
 
-**Query `ACCELATEST` first, not `ACCELAPROD`.** The scripts you're editing live in `accela-test`,
-and `accela-test`'s scripts are written against/deployed to `ACCELATEST` — that's the DB whose
-config actually matches the code you're reading. `ACCELAPROD` is what's *live in production today*,
-which can lag behind (see the "Detecting In-Progress or Stale Work" note in `../SKILL.md`) — query
-it too, but to answer "what's actually deployed/promoted," not as your primary source of truth for
-"what does the current script expect." Getting this backwards produces confidently-wrong findings
-(e.g. concluding a task/status/inspection-result doesn't exist or isn't wired up, when it does and
-is — just not yet promoted to prod).
+For the usual `accela-test` development workflow, query `ACCELATEST` first for
+the test configuration, then compare `ACCELAPROD` for promoted/live configuration.
+For another target, query that target's baseline first. Do not infer deployment
+or code/config alignment from a checkout name: inspect the scripts and label
+every finding by environment. A task/status/result present only in test is not
+missing from test and is not yet evidence of production readiness.
 
 Using [`database-schema.md`](database-schema.md), pull and record:
 
@@ -70,8 +69,9 @@ that exact wording. The dedicated script names and branch conditions should mirr
 inspection/result/status strings, so a shared wildcard branch can be disabled cleanly for that
 record type.
 
-Write this up as a dated reference doc (see the construction-material example for format): what's
-confirmed to exist today, straight from the database, with no interpretation yet.
+Write a dated reference doc with separate production and test sections. A
+"prod-config-reference" must identify confirmed production values, not silently
+present test-only configuration as live.
 
 ## Step 4 — Read the Current Scripts
 
@@ -180,9 +180,11 @@ Produce an implementation plan doc with:
 - Test cases mapped 1:1 to normalized behaviors.
 - Suggested file touch list.
 
-Then implement in `accela-test`, per [`emse-scripts.md`](emse-scripts.md), and remind the user
-about the deploy step (copy to `accela_scripts`) — implementing in `accela-test` alone does not
-change production/test system behavior.
+Do not implement yet: complete the explainer/design confirmation in Steps 8-9,
+resolve open decisions, and create the execution cards in Step 10. Then implement
+in the confirmed checkout per [`emse-scripts.md`](emse-scripts.md). Copying to a
+confirmed deployment target is separate and requires authorization; source
+edits and Git commits alone do not change the running system.
 
 ## Step 8 — Write Plain-Language Explainer Docs for the Requestor
 
@@ -191,7 +193,7 @@ developer — dense, technical, cross-referenced. The requestor also needs a **s
 plain-language explanation of what's changing and why, or they have no way to sanity-check the
 plan against their own mental model of the business process.
 
-- Write one short `.md` file per major component (mirror however Step 9's TFS cards end up split —
+- Write one short `.md` file per major component (mirror however Step 10's TFS cards end up split —
   e.g. one for Workflow, one for Inspections, one for Scripts, one for Testing), in the same
   `local-notes/<project>/` folder, named `<project>-<component>-explainer.md`.
 - Each file: what's changing, current state vs. target state, in plain sentences — no SQL, no

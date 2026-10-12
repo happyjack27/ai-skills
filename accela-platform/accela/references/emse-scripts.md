@@ -63,20 +63,25 @@ result and the workflow transition as two separate, possibly-unrelated things to
 
 ## Deployment Flow
 
-1. Edit/add the `.js` file under `accela-test/Scripts/Event/` (or the relevant subfolder —
+Confirm the source checkout and test/production target before editing or copying.
+The following is the usual `accela-test` workflow, not automatic deployment approval.
+
+1. Edit/add the `.js` file under the confirmed checkout's `Scripts/Event/` (or the relevant subfolder —
    `Batch/`, `Config/`, `Expression/`, `Interface/`, `Pageflow/`, `Set/`).
-2. Commit/push in `accela-test` per the repo's normal git workflow.
+2. Validate the changes; commit/push in that checkout only when authorized.
 3. **Deploy by copying the file(s) to the `accela_scripts` folder** — this is the folder the live
    Accela app server actually loads scripts from. Confirm the exact path with the user if it isn't
-   already established in the session; it is a deployment target, not necessarily itself a git repo.
+   already established in the session; confirm the environment and deployment authorization.
+   It is a deployment target, not necessarily itself a git repo.
 4. A new script file becomes active once deployed — Accela resolves the event/record-type binding
    from the filename convention, so no separate Admin-console "attach script to event" step is
    needed for `Scripts/Event/*.js` files in this setup. It still needs to physically reach
    `accela_scripts` to run; a change only committed in `accela-test` has no effect on production.
 
 Don't confuse `accela_scripts` (deployment target) with the `accela-scripts` git repo in this
-workspace — despite the near-identical name, `accela-scripts` currently contains unrelated
-`LaborComplianceReporting` SQL report files, not the deployed Accela script set. If in doubt, ask.
+workspace. The latter is an Accela script repository, not a LaborComplianceReporting SQL-report
+repository. Verify which checkout is authoritative for the current task and confirm the deployment
+path before copying files; do not infer either role from the similar names.
 
 ## Config JSON Files (non-script config also living in `accela-test`)
 

@@ -58,6 +58,8 @@ mapping, or the database and file-transfer behavior around Workday.
 
 - `DPW_Citytime_Workday_Integration` is the actual Java transfer program. It imports inbound CSVs
 	from a mounted folder into CityTime and exports outbound DTICKET CSVs to another mounted folder.
+- `ImportFromWorkday.java` and `ExportToWorkday.java` are the source entry points for those
+	database-facing import and export flows; they do not implement the external SFTP transport.
 - `DPW_CitytimeSSO` is a separate Java 8 Swing/Entra ID application; do not confuse its identity
 	flow with the Workday file-transfer process.
 - The CityTime data contract uses PeopleSoft-style tables such as `PS_JOB`, `PS_EMPLOYMENT`,

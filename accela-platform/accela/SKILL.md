@@ -27,15 +27,26 @@ confirm.
   Citizen Access (ACA) portal front-end customization beyond the `ACA*` event scripts already in
   the repo.
 
+## Routing Boundaries
+
+- Use for Accela record configuration, EMSE implementation, and admin/script
+  boundaries. Pair with `accela-spec-normalizer` for loose record-type specs.
+- Use `accela-reports` for Crystal Reports and report field maps; use the Java
+  or SQL skill for generic language work without Accela-specific behavior.
+
 ## Environments
+
+Confirm the authoritative source checkout and target environment for the task.
+The usual `accela-test` workflow below is not a reason to edit another checkout
+or deploy to production without authorization.
 
 | Name | What it is | Access |
 |---|---|---|
 | `sql-dev ACCELAPROD` | Read-only SQL Server snapshot of the live Accela database (`AAPROD` on `SQL-DEV`) | Connect via the `mssql_*` tools, saved profile `sql-dev ACCELAPROD` |
 | `sql-dev ACCELATEST` | Read-only SQL Server snapshot of the Accela **test** database (`AATEST` on `SQL-DEV`) | Connect via the `mssql_*` tools, saved profile `sql-dev ACCELATEST` |
-| `accela-test` (git repo, workspace folder `accela-test`) | Working/dev copy of the EMSE scripts. **Start every change here.** | Git repo, edit directly |
+| `accela-test` (git repo, workspace folder `accela-test`) | Usual working/dev copy of the EMSE scripts; confirm it is authoritative for the task | Git repo, edit after confirming the source |
 | `accela_scripts` | Deployment target folder that the live Accela app server actually reads scripts from | Copy files here to deploy — **not the same as the `accela-scripts` git repo** (see note below) |
-| `accela-scripts` (git repo) | A different repo in this workspace; despite the similar name it currently holds unrelated `LaborComplianceReporting` SQL reports, not the deployed Accela scripts folder | Don't confuse with `accela_scripts` |
+| `accela-scripts` (git repo) | Accela script repository; its README describes it as a "script repository for lms", and it contains `Scripts/Event` plus batch, config, interface, pageflow, and set scripts | Not the `accela_scripts` deployment folder; confirm the authoritative source and deployment path for the task |
 | `accela-supp` (git repo) | Supplementary/reference copy of scripts (older or parallel copy) | Check here if `accela-test` is missing context on an existing script |
 
 **`ACCELAPROD` and `ACCELATEST` can and do disagree on record-type config** — e.g. a workflow
@@ -78,15 +89,18 @@ Before assuming a spec describes brand-new work, check whether `ACCELATEST` alre
    tracks "flesh this spec out into a plan" on the board from the start, before any DB research.
 2. **Identify the record type key** — Module/Type/SubType/Category (the same 4 segments used in
    EMSE filenames as `Module!Type!SubType!Category`, and in `appMatch('Module/Type/SubType/Category')` calls).
-3. **Pull the baseline config from `sql-dev ACCELAPROD`** using the queries in
+3. **Confirm the target environment and query its baseline config** using
    [`references/database-schema.md`](references/database-schema.md): record type row, workflow
    tasks, inspection types + result sets + auto-assign flags, ASI (SmartChoice) fields, fee items.
+   For the usual `accela-test` development workflow, query `sql-dev ACCELATEST`
+   first, then compare `sql-dev ACCELAPROD` for promoted/live configuration.
+   Label every finding by environment; never report test-only config as production.
    Don't guess at existing result values, task names, or fee codes — look them up.
   - Verify the inspection type's `AUTO_ASSIGN` flag and target group/result-group wiring, and keep
     the script names / branch names aligned with the exact inspection, result, task, and status
     strings that exist in the DB.
 4. **Read the existing scripts** for this record type and any wildcard (`~`) parent scripts that
-   also fire for it, in `accela-test/Scripts/Event/`. See
+   also fire for it, in the confirmed source checkout's `Scripts/Event/`. See
    [`references/emse-scripts.md`](references/emse-scripts.md) for the naming/prefix convention and
    which scripts fire on which events.
   - Before drafting the plan, use the pre-plan comparison checklist in
@@ -95,27 +109,30 @@ Before assuming a spec describes brand-new work, check whether `ACCELATEST` alre
     vs. dedicated script branches.
 5. **Normalize the spec** against that baseline — note what already exists vs. what's new (new
    inspection result, new fee code, new workflow status, new ASI field, new CRM mapping).
-6. **Write/update the EMSE scripts** in `accela-test`.
-7. **Produce the companion docs** the user expects for this kind of task (see
+6. **Produce the implementation plan and companion docs** the user expects (see
    [`references/spec-analysis-workflow.md`](references/spec-analysis-workflow.md) for the exact
    format, modeled on prior work in `accela-test/local-notes/`):
-   - a **production-config-reference** doc (what's confirmed to already exist, queried from the DB)
+   - a **production-config-reference** doc (confirmed production config, with
+     test-only differences clearly labeled)
    - a **manual-system-actions** doc (what the user must configure/confirm in Accela Admin —
      assignments, missing inspection results, fee item activation, workflow status labels, CRM
      mapping — since none of that is achievable through script/file changes)
    - plain-language **explainer doc(s)** with the end-to-end lifecycle diagram, plus a **test
      cases** doc mapped 1:1 to the normalized behavior
-8. **Consolidate the explainers + test cases into one design-confirmation `.docx`** (see
+7. **Consolidate the explainers + test cases into one design-confirmation `.docx`** (see
    [`references/spec-analysis-workflow.md`](references/spec-analysis-workflow.md) Step 9) and get
-   the requestor to confirm it matches their intent **before** starting the implementation tail
-   end of step 6/7 — this is a distinct, requestor-facing deliverable, not a repackaging of the
+   the requestor to confirm it matches their intent **before** implementation.
+   This is a distinct, requestor-facing deliverable, not a repackaging of the
    two docs above (which are dev/admin-only).
-9. **Create a TFS work item per major implementation step** (e.g. add/activate inspection results,
+8. **Create a TFS work item per major implementation step** (e.g. add/activate inspection results,
    update workflow tasks/statuses, add an ASI field, script changes per record type, each
   manual-admin action) using [`../../development-tools/tfs-boards/SKILL.md`](../../development-tools/tfs-boards/SKILL.md), parented under
    the item from step 1 — the board should reflect the plan before work starts, not after.
-10. Flag anything you couldn't confirm from the DB (e.g., which user/queue an assignment group
-    resolves to) as an **open decision** rather than guessing.
+9. **Resolve open decisions, then write/update the EMSE scripts** in the confirmed
+   source checkout (usually `accela-test`). Never guess unconfirmed assignments,
+   result values, fee codes, or task/status strings.
+10. **Validate the normalized behavior and confirm deployment authorization and
+    target** before copying files. A Git commit alone does not deploy scripts.
 
 ## Manual Admin Steps — Always Check These
 

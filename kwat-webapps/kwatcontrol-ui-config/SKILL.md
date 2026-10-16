@@ -62,6 +62,10 @@ KWATControl database schema.
 
 ## Read Only What You Need
 
+- [`Schema verification`](../../development-tools/sql/references/schema-verification.md) -
+  read before database-backed application changes or when using KWATControl to
+  discover exact field names, `SELECT_FROM`, and foreign-key mappings while an
+  application database is unavailable. Configuration proves mappings, not lookup values.
 - [`references/core-tables.md`](references/core-tables.md) - table and column meanings.
 - [`references/workflows.md`](references/workflows.md) - operation-specific SQL procedures.
 - [`references/architecture-flow.md`](references/architecture-flow.md) - metadata flow, caching, and rendering.

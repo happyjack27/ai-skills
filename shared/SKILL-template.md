@@ -54,6 +54,9 @@ _What is included? What is explicitly out of scope?_
 
 ## Quality Standards
 
+- Follow [shared coding standards](../../shared/coding-standards.md), especially
+  evidence and exactness, when implementing or debugging code. Verify facts
+  against authoritative sources; do not guess.
 - _Standard 1_
 - _Standard 2_
 

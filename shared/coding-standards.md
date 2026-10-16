@@ -2,6 +2,25 @@
 
 Standards that apply across all programming skill folders.
 
+## Evidence and Exactness
+
+- Verify implementation-relevant facts against the authoritative source before
+  coding: the actual database/schema and lookup rows, repository source, API
+  contract, configuration, or observed runtime behavior, as appropriate.
+- Never invent field names, casing, joins, status values, method signatures,
+  response shapes, or business rules. Treat existing code and memory as leads
+  to verify, not proof that an assumption is correct.
+- Prefer direct inspection and reproducible checks over plausible explanations.
+  Distinguish verified facts from hypotheses and report contradictions explicitly.
+- Use authorized alternative sources or connections when evidence is unavailable.
+  If required facts still cannot be verified, report the precise blocker and stop
+  the dependent change rather than filling the gap with a guess.
+- Validate the exact requirement and observable result, including types, output
+  shape, encoding, edge cases, and measurable limits. Compilation alone, a proxy
+  check, or a test built from the same unverified assumption does not prove correctness.
+- Claim only what the evidence establishes. State validation not performed and
+  remaining limitations. In code, "close enough" is not correct.
+
 ## Naming
 
 - Variables and functions: descriptive, not abbreviated.

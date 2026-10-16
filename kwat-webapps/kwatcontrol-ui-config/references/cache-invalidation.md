@@ -79,15 +79,18 @@ No immediate action needed for non-urgent changes
 
 **Option C: Manual Cache Clear** (if app supports it)
 ```
-Call Services servlet with cache-clear action:
-GET /kwat/Services?action=ClearMetadataCache&app=KWAT
+Call the app's Services servlet with:
+GET /<application-context>/Services?method=flushCache
 
-(Implementation varies by app version; check with admin)
+`CoreServices3` clears the metadata, user-metadata, and method-access caches for that
+app-server instance. This does not clear browser-side metadata.
 ```
 
-**Option D: Invalidate Specific Entry** (if app supports it)
+**Option D: Clear another app's server caches from KWATControlMSSQL**
 ```
-GET /kwat/Services?action=InvalidateTableCache&table=Contractor
+Invoke `flushCacheOtherApp` with the target `app_name`. KWATControlMSSQL calls
+`Services?method=flushCache` on its configured application hosts. Inspect the per-host
+responses; the wrapper can report overall success even when an individual host fails.
 ```
 
 ### Example Scenario

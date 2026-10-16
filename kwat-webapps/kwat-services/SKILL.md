@@ -56,6 +56,25 @@ resolved by the language server).
 
 ## Key Conventions
 
+### Database-backed handlers: verify metadata first
+- Before editing CRUD hooks, synchronization handlers, or database-derived
+  `JsonMap` access, verify the actual table/view, exact column names/casing, keys,
+  and foreign-key mappings. Never invent fields such as `STATUS` or `TAXKEY`
+  merely because they sound plausible.
+- When a SQL password is unavailable, use SQL-STG with Windows authentication,
+  then SQL-DEV with Windows authentication, and the KWATControl metadata fallback in
+  [`schema verification`](../../development-tools/sql/references/schema-verification.md).
+  Check `APP_TABLES.SELECT_FROM` and `APP_TABLE_COLUMNS` when application source
+  contains no schema. A failed saved SQL connection is not proof that Windows
+  authentication or metadata discovery is unavailable.
+- If required metadata or lookup data remains unverifiable after these attempts,
+  report the blocker and stop the dependent edit; never guess fields or status semantics.
+- Resolve lookup IDs through the configured foreign table and verify the rows
+  that determine business behavior. Do not assume that the CRUD request contains
+  a joined display label or that a lookup's `Active` flag controls the business action.
+- Validate the status/lookup predicate against verified database evidence, not
+  just compilation or tests built from the same guessed field names.
+
 ### `CoreServices3` (base servlet)
 - Override `doGetCustom` / `doPostCustom` / `processRequest` — that's the whole extension surface
   (see the class's own doc comment).

@@ -29,6 +29,71 @@ VALUES
      1, 1, 0, 1, 1, 1);
 ```
 
+## Add a Physical Table
+
+1. Verify the physical table, columns, foreign keys, indexes, and CRUD procedures in every
+   application database that consumes the shared KWATControl configuration.
+2. Create and test the physical schema and procedures before adding an active table row or
+   columns to KWATControl.
+3. Add the application table and column metadata, then verify the rows and test the UI in each
+   intended environment.
+4. When replacing a field, mark its metadata obsolete only after the replacement is available
+   in those environments; retain the old physical column until its data can be safely retired.
+
+Do not assume a missing physical table or column is silently ignored. In the KWAT dynamic-table
+path, the client queries using the configured table name and surfaces failed requests as errors.
+Because the populated KWATControl configuration may be shared across environments, an active
+metadata row can expose a table whose physical schema has not yet been deployed there.
+
+## Expose a Nested Child Table
+
+To show a child table as a tab on its parent record detail, verify all of the following:
+
+1. The child `APP_TABLES` row is active.
+2. The child FK column is named exactly `FK_<ParentTable>`, with `FK_TABLE` set to the parent,
+   `FK_KEY` set to its primary key, and `FK_VALUE` set to the intended parent label column.
+3. The FK column has `FK_SHOW_JOIN = 1` and is not obsolete.
+4. The user's effective table rights allow `select` on the child. `MENU_PARENT` alone does not
+   expose the nested tab.
+
+`CoreServices3.controlGetInverseMetaInfo` collects active child tables through `FK_TABLE`.
+`injectRecordDetail.jsp` then filters for the exact `FK_<ParentTable>` column, `FK_SHOW_JOIN`,
+and effective select access. It derives the tab label from the child `HUMAN_NAME` by removing the
+parent table name and pluralizing the remainder; for example, `Project Collaboration` appears as
+`Collaborations`.
+
+Verify the relationship and display flags before testing:
+
+```sql
+SELECT t.TABLE_NAME,
+       t.HUMAN_NAME,
+       t.ACTIVE,
+       t.MENU_PARENT,
+       c.COLUMN_NAME,
+       c.FK_TABLE,
+       c.FK_KEY,
+       c.FK_VALUE,
+       c.FK_SHOW_JOIN,
+       c.OBSOLETE
+FROM dbo.APP_TABLES AS t
+JOIN dbo.APP_TABLE_COLUMNS AS c
+    ON c.APP_NAME = t.APP_NAME
+    AND c.TABLE_NAME = t.TABLE_NAME
+WHERE t.APP_NAME = @AppName
+    AND t.TABLE_NAME = @ChildTable
+    AND c.COLUMN_NAME = @ParentFKColumn;
+```
+
+For a system-generated primary key that should not appear in the grid or form, set
+`APP_TABLE_COLUMNS.INITIALLY_SHOWN = 0` and `SHOWN_ON_FORM = 0`; retain `WRITABLE = 0`,
+`OBSOLETE = 0`, and the key mapping in `APP_TABLES.PRIMARY_KEY`. A saved
+`APP_USER_COLUMN_DEFAULTS.INITIALLY_SHOWN` value can override the shared grid default. Check for
+such overrides, but do not change per-user defaults unless that scope is explicitly requested.
+
+After changing table or column metadata, clear the server metadata cache for the actual application
+instance and reload the page. See [Cache invalidation](./cache-invalidation.md); a browser refresh
+alone does not clear a stale server-side metadata cache.
+
 ## Add a Dropdown
 
 1. Insert the category and values into `APP_DROPDOWNS`.

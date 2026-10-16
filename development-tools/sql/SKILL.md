@@ -57,7 +57,13 @@ Help an AI write, optimize, and explain SQL queries and schema changes.
 
 ## Workflow
 
-1. Confirm the dialect and schema.
+1. Verify the dialect, exact schema, keys, joins, and relevant lookup values against
+   database metadata before writing queries or database-backed application code.
+   Do not infer field names, casing, status codes, or foreign-key meanings from
+   conventions or existing unverified code. For SQL Server discovery and the City
+   of Milwaukee Windows-authentication fallback (SQL-STG, then SQL-DEV) and
+   KWATControl metadata fallback, read
+   [`references/schema-verification.md`](references/schema-verification.md).
 2. Write the query with the formatting rules below.
 3. Explain any non-obvious joins, window functions, or CTEs.
 4. Suggest indexes if a performance issue is apparent.
@@ -85,6 +91,7 @@ Help an AI write, optimize, and explain SQL queries and schema changes.
 
 ## Validation Checklist
 
+- [ ] Exact column names/casing, keys, joins, and business lookup values verified; evidence source identified.
 - [ ] Query runs without syntax errors on stated dialect.
 - [ ] Results verified against sample data.
 - [ ] No `SELECT *` in final output.

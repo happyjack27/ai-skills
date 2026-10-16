@@ -1,6 +1,6 @@
 ---
 name: mssql-dynamic-tables
-description: 'SQL Server file tables and dynamic schema generation: using development.DynamicFile and development.DynamicSQUID procs to create file-storage tables with CRUD operations, persisted FK columns, indexes, triggers, and delete-tracking. Includes naming conventions for constraints, computed columns, and proc patterns. Use when creating new file tables (ProjectFile, ContractorFile, etc.) or understanding existing ones.'
+description: 'SQL Server file tables and CRUD procedure generation: use development.DynamicFile for file-storage schema and development.DynamicSQUID for standard CRUD procedures, including ordinary tables. Covers persisted FK columns, indexes, triggers, delete-tracking, and naming conventions. Use for ProjectFile/ContractorFile patterns or when generating SQL Server CRUD procedures.'
 ---
 
 # SQL Server Dynamic File Tables & Schema Generation
@@ -21,7 +21,7 @@ Help an AI generate standardized file-storage tables and CRUD procedures on SQL 
 **Out of scope:**
 - Blob/FileStream storage in database (these tables reference fileshare paths only).
 - Complex multi-parent file relationships (pattern assumes single FK_ID → one parent table).
-- Non-file tables (use `sql` skill for general DDL).
+- Physical DDL for non-file tables (use the `sql` skill; `DynamicSQUID` can still generate their CRUD procedures).
 
 ## When to Use
 
@@ -39,7 +39,7 @@ Help an AI generate standardized file-storage tables and CRUD procedures on SQL 
 
 **Use the SQL skill instead when:**
 
-- Writing general SQL queries or DDL for lookup, reporting, metadata, or other non-file tables.
+- Writing general SQL queries or physical DDL for lookup, reporting, metadata, or other non-file tables. `DynamicSQUID` can still generate CRUD procedures after an ordinary table exists.
 
 **Pair with:**
 
@@ -147,6 +147,14 @@ Help an AI generate standardized file-storage tables and CRUD procedures on SQL 
    WHERE parent_object_id = OBJECT_ID('dbo.ProjectFile');
    ```
 
+## Ordinary Tables and Generator Behavior
+
+- `DynamicFile` creates the specialized file-table schema and trigger; do not use it for ordinary relational tables.
+- `DynamicSQUID` is table-agnostic and can generate the seven standard CRUD procedures for an existing ordinary table.
+- `DynamicListFKConstraints` and `AllIndexesCreate` return candidate DDL rows; they do not execute the statements. Review `AlreadyExists` and apply only the needed FK/index statements.
+- `DynamicSQUID @DoDrops = 1` drops the selected generated procedures before recreating them. It does not drop a table or trigger. Use `0` for a new table; use `1` only when intentionally regenerating existing procedures.
+- For cross-environment deployment, verify that `development.DynamicSQUID` exists in the target instead of assuming it matches development. If the target lacks the generator, deploy only the reviewed generated procedure definitions from a known-good source when that is the approved rollout; verify their dependencies (for example, `itmd.RegExReplace`) and test CRUD in a rollback transaction. Treat installing the generator itself as a separate schema change.
+
 ## Column Details
 
 | Column | Type | Default | Computed | Persisted | Purpose |
@@ -184,7 +192,7 @@ Help an AI generate standardized file-storage tables and CRUD procedures on SQL 
 
 - **Running DynamicSQUID before DynamicFile** — DynamicSQUID expects the table to exist; you'll get "object does not exist" errors. Always run DynamicFile first.
 - **Forgetting to run Phase 3** — CRUD procs work, but queries are slow and there's no data integrity if FKs and indexes are missing.
-- **Editing DynamicFile output manually** — if you modify the generated table/trigger, re-running DynamicFile will fail because objects already exist. Use `@DoDrops=1` in DynamicSQUID or manually DROP before re-running.
+- **Confusing DynamicSQUID drops with table cleanup** — `@DoDrops=1` only drops selected generated procedures; it does not remove a table or trigger. Do not use it to try to rerun `DynamicFile` over existing objects.
 - **Wrong @FKTable parameter** — if you pass `@FKTable = 'Projects'` (plural) instead of `'Project'`, the computed FK_[Parent] column and constraints will reference a nonexistent table. **Verify the parent table name first**.
 - **Not comparing against ContractorLienWavier** — existing file tables (ContractorLienWavier) are the reference pattern. If your new table differs in index naming, FK naming, or column structure, suspect a parameter error or proc bug.
 

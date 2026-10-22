@@ -85,6 +85,12 @@ resolved by the language server).
 - `processRequest(ServiceData2 serviceData)` is the standard dispatch point — servlets typically
   switch/if-chain on `serviceData.method` and route to private handler methods, returning a
   `JsonMap` directly.
+- City web-app URLs generally use the environment host followed by the deployed project/context
+  name: `https://<host>/<ProjectName>/`. Use `staging.milwaukee.gov` for staging,
+  `mintapps.milwaukee.gov` for internal production, and `itmdapps.milwaukee.gov` for public
+  production. For localhost, use `localhost` with the active local server's protocol and port.
+  Append the page or servlet path after the project name when needed. Reuse the user's specified
+  environment; do not silently substitute staging, internal, or public production.
 - `callRemoteService(host, endpoint, method, params)` is how one app calls another app's servlet:
   it POSTs to `https://<host>/<endpoint>?method=<method>`. This is the origin of the "Services"
   naming convention (e.g. `ItmdServices`, `.../Services.java` servlets) — "KWAT services" refers to

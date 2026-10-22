@@ -92,6 +92,32 @@ The list header has a view menu. The default view is **My Open Requests**.
 - The Actions sheet lists Edit Request, Pick up, Assign, Mark FCR, Add Note, and
   Add Task. Do not use any of them without explicit instruction.
 
+## Closing or Changing Status (Close Request dialog)
+
+Opening the close dialog is read-only. Only Save changes the request. Do not Save
+unless the user explicitly asks to close or change the request.
+
+The **Close Request** dialog has these fields, in order:
+
+| Field | Type | Guidance |
+|---|---|---|
+| Is FCR | checkbox | Check only for a first-contact resolution the user confirms. |
+| Requester Acknowledged Resolution | Yes / No | Defaults to **No**. Set **Yes** only when the requester confirmed the fix. |
+| Closing Comments | text | Short resolution summary for the requester. |
+| Closure Code | dropdown | Pick the code the user names. Ask if none is given. |
+| **Closure Comments / Status Change Comments** | text (bottom box) | Required status note for the change. Fill it with the text the user approves. |
+
+- **Status-change box:** write one or two plain sentences: what was done or why the
+  status changed, and any open follow-up. Match the tone of the user's replies. Don't
+  add links, requester contact details, or internal notes.
+- **Draft, then confirm:** show the user the exact text for the status-change box and
+  the Closing Comments, and Save only after they approve it.
+- **Not a reply:** this box is internal to the ticket. Requester emails are separate
+  and follow the Drafts-only rule.
+- **Keep it in memory:** when the status changes, record the change and the approved
+  text in the request's ai-memory checkpoint (see Closing in the tracking section).
+- **Cancel leaves no change:** Cancel or the X closes the dialog without saving.
+
 ## Tracking Requests in ai-memory
 
 Track every open request the user owns, and its progress toward resolution, in
@@ -158,6 +184,8 @@ for format details.
 - Tracking progress only in chat. The next session can't see it, so save the checkpoint.
 - Creating a second checkpoint for a request that already has one. Search first.
 - Sending a requester reply without the user's approval.
+- Saving the Close Request dialog to test it, or leaving Requester Acknowledged set to Yes without the requester's confirmation.
+- Filling the Closure Comments / Status Change Comments box with text the user hasn't approved.
 
 ## Validation Checklist
 
@@ -169,6 +197,7 @@ for format details.
 - [ ] Each open request has one ai-memory checkpoint, registered in `working\WORKING.md` with a current status.
 - [ ] Checkpoint status matches the live mkesdp list, and its next action names an owner.
 - [ ] Replies to requesters are drafts unless the user approved sending.
+- [ ] Close Request dialogs were only opened, not saved, unless the user asked for the change; the status-change box holds approved text.
 
 ## Resources
 

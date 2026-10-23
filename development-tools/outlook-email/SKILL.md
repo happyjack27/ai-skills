@@ -161,6 +161,8 @@ with Reply All, because the reply is what updates the ITDesk ticket. Procedure:
 
 - Open [mail access methods](./references/mail-access.md) when choosing between
   classic Outlook COM and Microsoft Graph, or when reading, changing read state,
-  flagging, drafting, or sending mail.
+  flagging, drafting, or sending mail. It also covers looking up a person's SMTP
+  address through the directory (`CreateRecipient` and `Resolve`), which is
+  read-only.
 - Run [new-reply-draft.ps1](./scripts/new-reply-draft.ps1) to create a saved
   Reply All draft (default) or Reply draft from an EntryID. It never sends.

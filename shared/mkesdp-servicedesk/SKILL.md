@@ -228,8 +228,11 @@ ai-memory Working Memory at `C:\Users\kbaas\git\ai-memory`. Use the
 [ai-memory lifecycle policy](C:/Users/kbaas/git/ai-memory/docs/lifecycle.md)
 for format details.
 
-- **One checkpoint per request:** `working\<project-id>\tasks\itdesk-<number>-<kebab-subject>.md`.
-  The `itdesk-` prefix and the request number make the file easy to find.
+- **One folder per request:** `C:\Users\kbaas\git\ai-memory\working\mkesdp-tickets\<number>\`
+  (`<number>` is the display number, such as `66537`). Put the checkpoint in it as
+  `itdesk-<number>-<kebab-subject>.md`. Put query exports or other output in an optional
+  `output\` subfolder (for example `working\mkesdp-tickets\66537\output\`). Don't put
+  ITDesk checkpoints in project `tasks\` folders.
 - **Project:** the project the request concerns, such as `enotify-suite` for E-Notify
   issues or `outlook-inbox` for Accela, DPW, and general application support. If it's
   unclear, check [projects/PROJECTS.md](C:/Users/kbaas/git/ai-memory/projects/PROJECTS.md)
@@ -249,8 +252,8 @@ for format details.
 - **Register it:** add or update a row in
   [working/WORKING.md](C:/Users/kbaas/git/ai-memory/working/WORKING.md) with project,
   task title, status, date, and checkpoint link.
-- **Find before creating:** search `working\WORKING.md` and the project's `tasks\`
-  folder for `itdesk-<number>`. Update an existing checkpoint rather than making a second one.
+- **Find before creating:** check `working\mkesdp-tickets\<number>\` and search
+  `working\WORKING.md` for `itdesk-<number>`. Update an existing checkpoint rather than making a second one.
 - **Contents:** goal and completion conditions (what "done" means), current state
   (what was done and what remains), validation (what was tested or checked, and what
   wasn't), and the blocker or exact next action with its owner.
@@ -303,7 +306,7 @@ for format details.
 - [ ] No request was created without explicit user instruction, and no existing request was changed, assigned, or closed.
 - [ ] A new request was submitted only after the user approved every field, including the Description.
 - [ ] No credentials, requester email addresses or phone numbers, or full ticket text were saved to skills or memory.
-- [ ] Each open request has one ai-memory checkpoint, registered in `working\WORKING.md` with a current status.
+- [ ] Each open request has one ai-memory checkpoint in `working\mkesdp-tickets\<number>\`, registered in `working\WORKING.md` with a current status.
 - [ ] Checkpoint status matches the live mkesdp list, and its next action names an owner.
 - [ ] Replies to requesters are drafts unless the user approved sending.
 - [ ] Close Request dialogs were only opened, not saved, unless the user asked for the change; the status-change box holds approved text.

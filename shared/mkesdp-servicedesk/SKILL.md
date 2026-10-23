@@ -142,6 +142,20 @@ but are never saved to skills or memory.
 - The Actions sheet lists Edit Request, Pick up, Assign, Mark FCR, Add Note, and
   Add Task. Do not use any of them without explicit instruction.
 
+## Editing Request Fields (learned 2026-10-23)
+
+- The details page's read-only fields (such as **Emails to Notify**, shown as "-")
+  do not open on click or double-click, and hovering shows no edit icon.
+- Use the toolbar **Edit** button on the details page. It opens the full
+  `Edit Incident` form at `/app/itdesk/ui/requests/<internalId>/edit`. The request
+  number appears at the top right of that form.
+- In the edit form, **Emails to Notify** is a select2-style box below Description,
+  with the placeholder `-- Select Emails to Notify --`. Clicking it focuses the box.
+  Typing an address to add it is not yet verified; check the picker first.
+- Nothing is saved until the form's Save is used. Confirm the exact value with the
+  user before Save, and leave the form with Cancel if the user declines.
+- Required fields in the edit form have a red asterisk.
+
 ## Closing or Changing Status (Close Request dialog)
 
 Opening the close dialog is read-only. Only Save changes the request. Do not Save

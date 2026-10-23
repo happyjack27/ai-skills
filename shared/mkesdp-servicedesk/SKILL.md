@@ -154,7 +154,7 @@ The **Close Request** dialog has these fields, in order:
 | Is FCR | checkbox | Check only for a first-contact resolution the user confirms. |
 | Requester Acknowledged Resolution | Yes / No | Defaults to **No**. Set **Yes** only when the requester confirmed the fix. |
 | Closing Comments | text | Short resolution summary for the requester. |
-| Closure Code | dropdown | Pick the code the user names. Ask if none is given. |
+| Closure Code | dropdown | Always **Success**, unless the user names a different code. |
 | **Closure Comments / Status Change Comments** | text (bottom box) | Required status note for the change. Fill it with the text the user approves. |
 
 - **Status-change box:** write one or two plain sentences: what was done or why the
@@ -180,7 +180,7 @@ The **Close Request** dialog has these fields, in order:
   it is too long.
 - Closure Code is a select2 dropdown (`#closure_info-closure_code`). The options are
   Cancelled, Failed, Postponed, Rejected, Resolved, Success, Unable to Contact, and
-  Unable to Reproduce. Use the code the user names. Do not default to Resolved.
+  Unable to Reproduce. Use **Success** by default. Use another code only when the user names it. Do not default to Resolved.
 - Requester Acknowledged Resolution is a radio group (name
   `closure_info-requester_ack_resolution`). It defaults to No.
 
@@ -276,6 +276,7 @@ for format details.
 - Saving the Close Request dialog to test it, or leaving Requester Acknowledged set to Yes without the requester's confirmation.
 - Filling the Closure Comments / Status Change Comments box with text the user hasn't approved.
 - Clicking the first "Save" on the page instead of the dialog's `name="submit"` Save.
+- Setting a closure code other than Success when the user didn't name one.
 - Using long closing text when the user asked for a short status note.
 - Clicking hidden checkboxes at computed coordinates, which can open the hamburger menu.
 - Assuming a request is closed because it left the Open view, without checking the Closed view.

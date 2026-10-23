@@ -8,16 +8,18 @@ description: 'City of Milwaukee IT service desk at mkesdp.milwaukee.gov (Zoho Se
 ## Purpose
 
 Help an AI read the user's City of Milwaukee IT service desk requests in a
-browser and report their status, without changing any request.
+browser, report their status, and create new requests when the user asks, in
+a browser. Do not change existing requests unless the user asks for that exact action.
 
 ## Scope
 
 - Included: reading request lists and status, switching list views, reading
-  request details where the layout allows, and mapping mkesdp numbers from
-  TFS work items to requests.
-- Excluded: creating, editing, assigning, picking up, closing, reopening, or
-  adding notes or tasks to requests. These change shared records; do them only
-  on explicit user instruction for that exact action.
+  request details where the layout allows, mapping mkesdp numbers from TFS work
+  items to requests, and creating a new request (see
+  [Creating a Request](#creating-a-request)) after the user approves the filled form.
+- Excluded: editing, assigning, picking up, closing, reopening, or adding notes or
+  tasks to existing requests. These change shared records; do them only on explicit
+  user instruction for that exact action.
 - Excluded: entering or storing credentials, bypassing Microsoft sign-in, and
   saving requester email addresses, phone numbers, or full ticket text to skills
   or memory. Request numbers and short subjects are fine.
@@ -83,6 +85,54 @@ The list header has a view menu. The default view is **My Open Requests**.
 - A request missing from "My Open Requests" is probably closed, but may have been
   reassigned. Confirm in "All My Requests" before reporting it closed.
 
+## Creating a Request
+
+Create a request only when the user asks for it. Fill the form, show the user
+the field values, and submit only after they approve. Submitting creates a
+shared record. Requester emails and phone numbers are entered into the form
+but are never saved to skills or memory.
+
+- **Open the form:** go to `https://mkesdp.milwaukee.gov/app/itdesk/ui/requests/add`
+  directly. Clicking the New Incident menu item is blocked by a Home breadcrumb
+  overlay. The menu path is the `+` button in the Requests list header, then New Incident.
+  "Quick Incident" is a separate header option and is not the same form.
+- **Required fields** (marked with an asterisk): Urgency, Request Type, Requester
+  Name, Work Phone, Category, Subject, Description. Urgency keeps its default
+  unless the user names one.
+- **Request Type** options: Incident Report (default), Security Incident, Service Requests.
+- **Group** options include Database Administration. **Category** options include
+  Database. Pick the values the user names; ask if none are given.
+- **Subject** is prefilled with "General Incident -- Please update this Subject line --".
+  Replace the whole text with the user's subject.
+- **Requester Name** is a typeahead with a search dialog. Searching for a person
+  may show "No requester found". The form says the requester is created when the
+  request is submitted, so the typed name is accepted. Confirm the value in the
+  form before submitting. For Kevin Baas the requester is "Baas, Kevin" (Last, First
+  format). Choose that typeahead match and confirm its department matches the user.
+  Press Escape to close the search dialog.
+- **Work Phone** and **Work Email** are separate textboxes. Do not put a phone
+  number in the email field.
+- **Description** is a rich-text editor inside an iframe. Snapshot tools do not
+  show its text. Setting `document.body.innerHTML` shows the text but does not
+  clear the form's "Provide value for field Description" error, so the submit is
+  rejected. Instead, click into the editor, clear it with a loop of Backspace
+  key presses (Ctrl+A did not select reliably), type the lines with keyboard.type
+  and Enter between them, then click another field (such as Subject) to blur the
+  editor. Check that the alert is gone before submitting.
+- **Submit button** is labeled "Add Request" (not Submit). It opens the new
+  request's details page, whose title is `#NNNNN Request Details`.
+- **Filling fields:** `typeInPage` with element refs misfired when refs shifted, and
+  phone and email ended up in the same field. Use `runPlaywrightCode` with
+  `page.getByRole('textbox', { name: ... }).fill(...)`, then read the page back to
+  verify each field.
+- **Keyboard select-all** (Ctrl+A, Shift+Home) did not select text reliably in the
+  Description editor. Replace the content instead.
+- **Verify, then ask:** before submitting, read back every field and the Description
+  text, and show them to the user. Submit only after approval.
+- **Record it:** after submission, note the new request number and the approved
+  subject in the ai-memory checkpoint and WORKING.md (see Tracking Requests in ai-memory).
+- **Save nothing sensitive:** do not record requester email, phone, or full ticket text in the skill or memory.
+
 ## Request Details
 
 - The detail pane renders inside a sandboxed iframe. Snapshot tools show it as
@@ -117,6 +167,45 @@ The **Close Request** dialog has these fields, in order:
 - **Keep it in memory:** when the status changes, record the change and the approved
   text in the request's ai-memory checkpoint (see Closing in the tracking section).
 - **Cancel leaves no change:** Cancel or the X closes the dialog without saving.
+
+### Field details and comment style (learned 2026-10-23)
+
+- The top box is **Closing Comments** (`#closure_info-requester_ack_comments`). The
+  bottom box is **Closure Comments / Status Change Comments**
+  (`#closure_info-closure_comments`). Fill only the box the user names, and clear the
+  top box unless the user supplies text for it.
+- Status-change text should be very short, in the user's own wording. For a
+  change of contact details, use a phrase such as `Updated email address.` Do not add
+  reasons, names, addresses, or follow-up notes. Shorten the text when the user says
+  it is too long.
+- Closure Code is a select2 dropdown (`#closure_info-closure_code`). The options are
+  Cancelled, Failed, Postponed, Rejected, Resolved, Success, Unable to Contact, and
+  Unable to Reproduce. Use the code the user names. Do not default to Resolved.
+- Requester Acknowledged Resolution is a radio group (name
+  `closure_info-requester_ack_resolution`). It defaults to No.
+
+### Saving the dialog
+
+- The dialog's Save is the button with `name="submit"` at the bottom of the dialog.
+  Other visible buttons labeled "Save" elsewhere on the page can be matched first.
+  Select by name, then confirm the position is inside the dialog before clicking.
+- After Save, check the dialog and the list. If the dialog is still open and shows
+  "Error" markers, the request is not saved. Read which field is invalid before retrying.
+- After a save, confirm the list row status and the closure code before recording it
+  in memory. A row missing from the Open view is not proof of closure. Check the
+  Closed or All My Requests views.
+
+### Browser handling
+
+- Use a desktop-width viewport (about 1280x900). At narrow widths the page shows a
+  mobile layout with no Close Request form. If the "Browser resized! Refresh" overlay
+  appears, reload.
+- Hidden inputs report a bounding box at (0,0). Clicking at computed coordinates can
+  hit the hamburger "Instances" menu instead. Click only visible elements, and
+  unselect a row after a misclick.
+- Keep the browser window visible and tell the user before each browser action. Do
+  not leave background pages or hidden windows. If the user cannot see a window, open
+  a new visible page and say so.
 
 ## Tracking Requests in ai-memory
 
@@ -186,13 +275,18 @@ for format details.
 - Sending a requester reply without the user's approval.
 - Saving the Close Request dialog to test it, or leaving Requester Acknowledged set to Yes without the requester's confirmation.
 - Filling the Closure Comments / Status Change Comments box with text the user hasn't approved.
+- Clicking the first "Save" on the page instead of the dialog's `name="submit"` Save.
+- Using long closing text when the user asked for a short status note.
+- Clicking hidden checkboxes at computed coordinates, which can open the hamburger menu.
+- Assuming a request is closed because it left the Open view, without checking the Closed view.
 
 ## Validation Checklist
 
 - [ ] Page title is `Requests - City of Milwaukee` and the URL is on `mkesdp.milwaukee.gov`.
 - [ ] The active view is confirmed in the snapshot before reporting.
 - [ ] Every number and status was read from the list rows or a visible detail field.
-- [ ] No request was created, changed, assigned, or closed.
+- [ ] No request was created without explicit user instruction, and no existing request was changed, assigned, or closed.
+- [ ] A new request was submitted only after the user approved every field, including the Description.
 - [ ] No credentials, requester email addresses or phone numbers, or full ticket text were saved to skills or memory.
 - [ ] Each open request has one ai-memory checkpoint, registered in `working\WORKING.md` with a current status.
 - [ ] Checkpoint status matches the live mkesdp list, and its next action names an owner.

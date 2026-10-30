@@ -61,6 +61,44 @@ Keep these failure modes explicit so they are not repeated.
 - Treat template confirmation as an executable check: run each report query for every record number shown in the Word/text source documents, compare owner mailing address, property address, date, identifier, and status-specific values to the document, and record any mismatch before handing the query to Crystal.
 - Do not assume a displayed `Re:` identifier is the Accela permit number or an `ACA temp Record #`; select both when the source is ambiguous and resolve which one matches the template's sample value in SSMS.
 
+## Finding a Report in Accela Report Manager (production)
+
+Use this when a ticket names a report but the report's file or SQL is not yet in `accela-reports`.
+Read-only: never click Submit, Save, or any edit control in Report Manager. The one exception is
+registering a newly deployed report, which the user must ask for; follow the "Register the deployed
+report in Report Manager" section of the `accela-report-deploy-request` skill.
+
+1. Open the production Accela site in a visible browser window with `openBrowserPage` (`forceNew: true`).
+   If the connection times out, retry once with a different admin URL. The page can still be reused.
+2. Open the admin console at `https://milwaukee-prod-av.accela.com/portlets/admin/en-us/#/`. The left menu
+   has `Report > Report Manager`. Expand `Report` with a normal click, then click `Report Manager`.
+   Do not try `#/home` (404) or the Main Menu; Admin is not on the Launchpad.
+3. Report Manager loads in a nested iframe (`reportsSetup.jsp` > `reportTree.do?mode=enTree`). The tree is
+   Dojo. Its text is empty until you expand nodes, so `innerText` searches return nothing at first.
+   - Expand `Reports by Name`. It lists folders by letter (0-9, A-Z).
+   - Expand the letter folder for the report name (for VBR reports, the `V` folder).
+   - Scroll the tree if the letter is off screen. Then read names from the frame with
+     `querySelectorAll('*')` filtered to leaf nodes whose text matches the name.
+   - Clicking a node name by `getByText` can time out. Use `page.mouse.click` on the screenshot coordinates
+     of the `+` icon if the Dojo click fails.
+4. Click the report name. The `reportDetail.do?module=Development&mode=edit&REPORT_ID=<id>` page shows the
+   report name, category ID, `reportLink` (the `.rpt` file, e.g. `VBR_InvoiceLetterSet-w_printedDate.rpt`),
+   format, and EDMS settings. Record REPORT_ID and the `.rpt` file name.
+5. Match the `.rpt` name to the repo copy under `C:\Users\kbaas\git\accela-reports\`. Names differ
+   (for example `w_printedDate` in production vs `w_printDate_Set` in the repo), so match on the report
+   title and the scripts that call it, not the exact file name.
+6. A `.rpt` is binary. Plain-text search of the file finds no SQL. If you need the SQL, get it from
+   Crystal Reports Designer (Database > Show SQL Query) or from the report owner. Do not assume the
+   repo file's SQL matches the production file.
+
+Lessons from this lookup:
+- Report names live in `Reports by Name > <letter>`, not in `Reports by Category`, which had no children
+  when expanded through automation.
+- The batch script name for a report (for example `VBR Invoice Letter w fixed Date` in
+  `Scripts\Batch\VBRInvoiceLetterwFixedDate.js`) may not match the Report Manager name exactly. The closest
+  tree entries were `VBR Invoice Letter Fixed Date` and `VBR Invoice Letter Fixed Date Set`. Confirm which one
+  the ticket means before you go further.
+
 ## Common Report Sources
 
 Read [`references/report-mapping.md`](references/report-mapping.md) before drafting SQL for a new report. It captures the report-source pattern confirmed in the fee-waiver example and keeps the lookup targets explicit.

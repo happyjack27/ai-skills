@@ -91,6 +91,20 @@ A use-case diagram should answer:
 
 The deliverable is not a vague design specification. The real value is in the schema view and the behavior flows.
 
+## Writing style: concise, no filler
+
+The user wants all docs, test reports, and Word/markdown deliverables short.
+
+- For screenshot-based test results, use a numbered chronological list: one short
+  action or confirmation, then its screenshot. Keep actions and confirmations
+  separate: confirm initial state, run import, confirm imported state, test UI.
+- State the condition and outcome together: "Confirm login with wrong password
+  fails" or "Confirm valid, unused username opens the final onboarding screen."
+- Let screenshots carry the proof; omit duplicate captions and explanations.
+- Omit contents/summary tables, purpose/background sections, and closing notes
+  unless requested. Do not repeat results in multiple formats.
+- Include only facts the reader needs to act on (result, state, open item).
+
 ## References
 
 Use the ERD files and the use-case flow diagrams as the canonical documentation package.

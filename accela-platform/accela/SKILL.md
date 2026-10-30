@@ -54,12 +54,14 @@ because it was the usual location in an earlier workflow.
 
 | Name | What it is | Access |
 |---|---|---|
-| `sql-dev ACCELAPROD` | Read-only SQL Server snapshot of the live Accela database (`AAPROD` on `SQL-DEV`) | Connect via the `mssql_*` tools, saved profile `sql-dev ACCELAPROD` |
+| `sql-dev ACCELAPROD` | **Stale** read-only snapshot (`AAPROD` on `SQL-DEV`). Verified 2026-10-30: newest `B1PERMIT.REC_DATE` is 2026-06-15 (AATEST 06-11, AASUPP 06-12). Good for configuration, never for records created after mid-June. Other DBs on SQL-DEV: AASUPP, AATEST, AccelaReporting (sewer/building views only), dbaAdmin | Use the `mssql_*` tools if present. If not, PowerShell `System.Data.SqlClient` with `Server=SQL-DEV;Database=AAPROD;Integrated Security=True;TrustServerCertificate=True` works read-only |
+| `live ACCELAPROD` (Accela-hosted) | The only current production database: server `MILWAUKEE-async-prod-db.us.erdb.accela.com,14332` (non-standard port), SQL login `ERDB_MILWAUKEE_PROD_01` | Works only in the user's MS SQL extension profile. The assistant's login attempts were rejected (2026-10-23); never retry, never ask for or store the password. Ask the user to run queries and paste results, or use the production Accela site in the browser |
 | `sql-dev ACCELATEST` | Read-only SQL Server snapshot of the Accela **test** database (`AATEST` on `SQL-DEV`) | Connect via the `mssql_*` tools, saved profile `sql-dev ACCELATEST` |
 | `accela-test` (git repo, workspace folder `accela-test`) | Test/development copy; use for work explicitly targeting AATEST, after verifying that target's configuration | Do not treat as the source for a production release |
 | `accela_scripts` | Deployment-side script location referenced by older repository guidance | Do not assume direct file copy is the current deployment procedure. For the Road Plate request, the user confirmed deployment through Accela's EMSE Script Manager/tool. |
 | `accela-scripts` (git repo) | Production source repository for the CRM-to-DPW request-type change in this workflow; contains `Scripts/Event`, batch, config, interface, pageflow, and set scripts | Edit, validate, commit, and push production source here; the repository itself is not the EMSE deployment |
 | `accela-supp` (git repo) | Supplementary/reference copy of scripts (older or parallel copy) | Check here if `accela-test` is missing context on an existing script |
+| `accela-scripts-converter` (git repo, `C:\Users\kbaas\git\accela-scripts-converter`) | **The 2.0 layer.** Java tool that pulls the legacy 2.0 EMSE scripts (Standard Choices in `RBIZDOMAIN`) out of the live Accela DBs and writes one file per event/record type. Also converts 2.0 to 3.0 | Read-only for investigations. Layout and rules in "Two Script Layers: 3.0 and 2.0" below. **Always check it when tracing what fires on a record** |
 
 **`ACCELAPROD` and `ACCELATEST` can and do disagree on record-type config** — e.g. a workflow
 process split or new status may already exist in `ACCELATEST` from earlier in-progress work that
@@ -116,7 +118,10 @@ Before assuming a spec describes brand-new work, check whether `ACCELATEST` alre
     the script names / branch names aligned with the exact inspection, result, task, and status
     strings that exist in the DB.
 4. **Read the existing scripts** for this record type and any wildcard (`~`) parent scripts that
-   also fire for it, in the confirmed source checkout's `Scripts/Event/`. See
+   also fire for it, in the confirmed source checkout's `Scripts/Event/`. **Also read the 2.0
+   layer in `accela-scripts-converter`** (see "Two Script Layers" below): the 3.0 repo omits
+   scripts that exist only as 2.0 Standard Choices, and `branch("PREFIX:...")` calls in 3.0 code
+   run 2.0 Standard Choices that are not in `accela-scripts` at all. See
    [`references/emse-scripts.md`](references/emse-scripts.md) for the naming/prefix convention and
    which scripts fire on which events.
   - Before drafting the plan, use the pre-plan comparison checklist in
@@ -142,7 +147,7 @@ Before assuming a spec describes brand-new work, check whether `ACCELATEST` alre
    two docs above (which are dev/admin-only).
 8. **Create a TFS work item per major implementation step** (e.g. add/activate inspection results,
    update workflow tasks/statuses, add an ASI field, script changes per record type, each
-  manual-admin action) using [`../../development-tools/tfs-boards/SKILL.md`](../../development-tools/tfs-boards/SKILL.md), parented under
+  manual-admin action) using [`../../internal-systems/tfs-boards/SKILL.md`](../../internal-systems/tfs-boards/SKILL.md), parented under
    the item from step 1 — the board should reflect the plan before work starts, not after.
 9. **Resolve open decisions, then write/update the EMSE scripts** in the confirmed
    source checkout for the requested target. For production CRM-to-DPW changes in
@@ -204,6 +209,96 @@ learning from doing it go in different places — don't dump everything into one
 | A finished, illustrative worked case (distilled after the fact, as a pattern to point future work at) | `examples/` in this skill |
 | Live, in-progress work on one specific record type (raw spec, running TODO, config-reference, manual-actions, implementation plan) | Configured Working Memory/task folder or the established local-notes folder — task bookkeeping, not the production source; never copy raw task material into this skill |
 
+## Two Script Layers: 3.0 and 2.0 (`accela-scripts-converter`, learned 2026-10-30)
+
+Both layers run for the same event. A trace that reads only `accela-scripts` is incomplete.
+
+- **3.0** = `accela-scripts\Scripts\Event\<EVENT>;<MODULE>!<TYPE>!<SUBTYPE>!<CATEGORY>.js` (git, deployed
+  through EMSE Script Manager).
+- **2.0** = legacy Standard Choices configured in Accela Admin (EMSE standard choice rows in
+  `RBIZDOMAIN`). They are not in git except as snapshots in `accela-scripts-converter`. They run after or
+  alongside the 3.0 script for the same event/record type. 3.0 code starts them with
+  `branch("ASA:Enforcement/Violation/Advisory/NA")` or `branch("CMN:...")` / `branch("EMSE:...")`.
+  A branch name maps to a converter file: `ASA:Enforcement/Violation/Advisory/NA` is
+  `ASA;ENFORCEMENT!VIOLATION!ADVISORY!NA.js`; `CMN:Enforcement/Case/Residential/NA/LoopCAPs` is
+  `CMN;ENFORCEMENT!CASE!RESIDENTIAL!NA!LOOPCAPS.js`.
+
+**Repo layout** (`C:\Users\kbaas\git\accela-scripts-converter`, branch `master`):
+
+| Path | What it holds |
+|---|---|
+| `output\production`, `output\support`, `output\test` | One file per 2.0 script, named like the 3.0 files (`EVENT;MODULE!TYPE!SUBTYPE!CATEGORY.js`; `~` is a wildcard). `production` = AAPROD, `support` = AASUPP, `test` = AATEST (about 370 files each). The `merged\` subfolder holds the few that have both a 2.0 and a 3.0 part |
+| `output\other_production`, `other_support`, `other_test`, `other_civcon` | Non-event scripts: `CONF_*` config text, includes, ACA handlers (about 15 files) |
+| File header | `// ===== 2.0 scripts (no 3.0 scripts)` = 2.0-only; `// ===== 2.0 scripts` followed by 3.0 text = both exist |
+| `output_sorted\<env>\<MODULE>\<TYPE>\...` | Same scripts re-sorted into record-type folders (`~` parts omitted; `CMN` and other prefixes under their prefix folder). Made by `SortScriptsByRecordType.bat` and reversed by `UnsortScriptsByRecordType.bat`; edit `output`, not `output_sorted` |
+| `output3.0FromDb\<env>\` | 3.0 conversion output written by `Convert3Scripts.java` |
+| `master scripts`, `incldues_custom`, `script_testing` | Reference copies of master event scripts and custom includes; scratch test scripts |
+| `src\AccelaDB.java`, `ConvertScripts.java`, `Convert3Scripts.java` | The tool. `AccelaDB` queries the Accela-hosted ERDB databases (`MILWAUKEE-async-{prod,supp,test}-db.us.erdb.accela.com`) with SQL logins that the tool holds. Never copy credentials out of it |
+
+**Freshness:** each `output\<env>` is a point-in-time dump. Check `git log -1 -- output/production` (last run:
+2026-09-24 as of 2026-10-30). A Standard Choice edited in Admin after that date is not in the dump. If a
+finding depends on a 2.0 script, say so and ask the user to confirm the Standard Choice in Admin (Accela
+Admin > Standard Choices) when the dump is older than the symptom.
+
+**How to search (do this on every "what fires on this record" question):**
+
+1. List the event files for the record type in both repos, including wildcards:
+   `Get-ChildItem output\production -Filter "*;ENFORCEMENT!*"` (also check the `merged\` folder).
+2. For each event in play (ASA, ASIUA, ISA, IRSA, WTUA, WTUB, CTRCA, CAA, CEA, ASUA), read the wildcard
+   (`~!~!~`), type-level (`!CASE!~!~`), and exact (`!CASE!RESIDENTIAL!NA`) files.
+3. Grep for side-effect calls: `createChild`, `createCap`, `scheduleInspection`, `resultInspection`,
+   `createCapComment`, `branch(`, `runEvent`, `closeTaskProcessCRM`, `updateAppStatus`.
+4. Resolve every `branch("X:...")` to its converter file and read it, because it runs inline.
+5. Compare with the 3.0 file for the same event and record the order both layers run.
+
+**Findings so far (Enforcement, production 2.0 dump):** the `ENFORCEMENT!~!~!~` wildcards (ISA assigns the
+Investigation task; CTRCA/CAA/CEA call `EMSE:SetContactRelationshipToContactType`; ASUA closes tasks on
+Void; WTUB blocks on fee balance) and `ASA;ENFORCEMENT!VIOLATION!ADVISORY!NA` (only `editAppSpecific`
+MPROP fields) do not create records. `ASIUA;ENFORCEMENT!CASE!RESIDENTIAL!NA` can schedule and result an
+inspection and create a Garbage child, but only when `Source2 = Mobile` and `Case Type` is
+DNS202010/203010/204010/205010.
+
+## Investigating Recent Records (read-only, learned 2026-10-30)
+
+For a ticket about records created in the last months (for example ENF-2026-34250), check the
+snapshot's newest `REC_DATE` first (`SELECT MAX(REC_DATE) FROM B1PERMIT`). If it is older than the
+records, do not search it. Instead:
+
+1. Read the code path in `accela-scripts` (event script, `git log` for the file and the last two weeks)
+   **and the matching 2.0 files in `accela-scripts-converter\output\production`** (see "Two Script
+   Layers" above).
+2. Open production Accela with `openBrowserPage` (`forceNew: true`) at
+   `https://milwaukee-prod-av.accela.com/`. The login is a username/password form ("Civic Platform
+   MILWAUKEE | Production"). The user signs in; the assistant never types credentials.
+3. Search the record by its alt ID and read, read-only: Inspections tab (result times and users),
+   Related Records (child ADV/violation records and created dates), Record Comments, and the
+   record History or Processing Status. Cite timestamps in the checkpoint.
+4. Never submit, save, result, or delete anything. Ask before any cleanup.
+
+Browser tips (learned 2026-10-30): the Civic Platform SPA is slow and flaky. Click the invisible
+"Open Global Search" link with `click({force:true})`, search the alt ID, click the result link with
+`force:true`, wait ~12 s, then read tabs through `page.frameLocator('iframe').first()` (tab links:
+Related Records, Inspections, Status History, Workflow History, Comments). Record URL pattern:
+`#/core/spacev360/milwaukee.<altid without dashes>` (for example `milwaukee.enf202634250`). A page
+reload drops you to the dashboard. Direct `/portlets/...do` URLs return an error without the SPA
+context. Do not call `setViewportSize` repeatedly; it can shrink the layout. Related Records shows
+parent chains like `ENF / ADV-642 / ADV-644`, which reveal nested creation.
+
+## Report Lookups from Production Accela (read-only)
+
+When a ticket names a Crystal report that is not yet in `accela-reports`, follow
+[`../accela-reports/SKILL.md`](../accela-reports/SKILL.md) "Finding a Report in Accela Report Manager".
+Browser rules that apply:
+
+- Open a new page with `openBrowserPage` (`forceNew: true`) so the window is visible to the user. If it
+  times out, retry. Do not reuse an old page after it has been marked not visible.
+- Production Accela: `milwaukee-prod-av.accela.com`. Admin is under the KB avatar > Administration. Report
+  Manager is `Report > Report Manager`.
+- Read the report name and `REPORT_ID` only. Never submit or save anything in Admin.
+- Ask the user for the report SQL (Crystal Designer or export). The `.rpt` binary has no readable SQL.
+- Before writing a date-window query, get the user's decision on the credit rule and the date basis
+  (assessed date vs invoice date). Do not guess these.
+
 ## Required Go-Live Handoff
 
 Do not end an implementation with only “not live,” “ask an admin,” or a generic deployment
@@ -253,7 +348,7 @@ that points to production.
   borrowed from that sibling skill — its diagram-consolidation style and `<gap>` convention are
   intentionally not used here.
 - [`../../development-tools/sql/SKILL.md`](../../development-tools/sql/SKILL.md) — general T-SQL guidance.
-- [`../../development-tools/tfs-boards/SKILL.md`](../../development-tools/tfs-boards/SKILL.md) — use alongside this skill to update the
+- [`../../internal-systems/tfs-boards/SKILL.md`](../../internal-systems/tfs-boards/SKILL.md) — use alongside this skill to update the
   TFS/Azure DevOps board (`tfs.milwaukee.gov`) as spec work progresses: move the card when starting
   a phase, add a comment summarizing what was found/changed, and move it to done once implemented
   and deployed — don't let the implementation-plan doc's phase tracking be the only place status

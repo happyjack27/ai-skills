@@ -145,7 +145,7 @@ $draft.Save()
 
 The item type `0` creates a mail item. Saving creates a draft; it does not send.
 
-Create a Reply All draft of an existing message (the default for ITDesk and
+Create a Reply All draft of an existing message (the default for ITHelp and
 helpdesk notices; see [reply-draft script](../scripts/new-reply-draft.ps1)):
 
 ```powershell

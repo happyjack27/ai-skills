@@ -66,6 +66,11 @@ mapping, or the database and file-transfer behavior around Workday.
 	`PS_NAMES`, `PS_LEAVE_ACCRUAL`, and `PS_Y_TRC_UNION_TBL`.
 - `DPW_Citytime_MSSQL/notes/crew-suporg-math.sql` describes a manual spreadsheet import and
 	employee-to-crew/supervisory-organization correlation workflow.
+- Live CityTime Oracle data (e.g. `TANDL.DTICKET`, `HIST.DTICKET` in DPWP) can be queried read-only
+	directly through the `dpwp` connection in the SQL Developer VS Code extension; check that first.
+	Fallback: `OPENQUERY(DPWP, ...)` on `sql-treas`. In `DTICKET`, `SDATE` is the load timestamp
+	(`ENTERED_ON` is a blank varchar on late rows), and `PP`/`PAY_END_DT` are the pay period it was
+	loaded into, so late-loaded overtime has `PP` later than the period containing `DATE_WORKED`.
 - `DPW_Includes_DataServer_MSSQL` contains shared CityTime query translation and routing code;
 	it is not itself evidence of a Workday API or scheduled exchange.
 

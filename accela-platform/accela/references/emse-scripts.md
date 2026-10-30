@@ -1,5 +1,9 @@
 # EMSE Event Scripts — Naming, Lifecycle, Deployment
 
+> **Two layers:** the files in `accela-scripts\Scripts\Event` are the 3.0 layer. Legacy 2.0 Standard
+> Choices also run on the same events and are only visible in `accela-scripts-converter\output\<env>`.
+> See "Two Script Layers: 3.0 and 2.0" in `../SKILL.md` before concluding what fires on a record.
+
 ## File Naming Convention
 
 `Scripts/Event/<Prefix>;<Module>!<Type>!<SubType>!<Category>.js`

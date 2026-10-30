@@ -9,6 +9,11 @@ particular differ from what public Accela documentation implies, so trust this f
 writes against it. Use the `mssql_*` tools with the saved profile `sql-dev ACCELAPROD`
 (`profileId 2c5e9367-ce23-47e9-a1d4-088e19acd981`, server `SQL-DEV`, database `AAPROD`).
 
+> **Freshness warning (verified 2026-10-30):** this snapshot's newest `B1PERMIT.REC_DATE` is
+> 2026-06-15. Records created after that (for example ENF-2026-xxxxx from October) are absent.
+> The current database is Accela-hosted (`MILWAUKEE-async-prod-db.us.erdb.accela.com,14332`),
+> reachable only through the user's MS SQL extension profile. See "Environments" in `../SKILL.md`.
+
 ## Naming Convention Decode
 
 Table/column prefixes are meaningful once you know the pattern:

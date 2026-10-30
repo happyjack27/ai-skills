@@ -1,6 +1,6 @@
 ---
 name: mkesdp-servicedesk
-description: 'City of Milwaukee IT service desk at mkesdp.milwaukee.gov (Zoho ServiceDesk Plus On-Demand, ITDesk app). Use to check the signed-in user''s open or closed mkesdp requests in a browser, read request status from list rows, sign in through Microsoft SSO, map "mkesdp #NNNNN" references in TFS work items to requests, and track each request and its progress in ai-memory working checkpoints. Keywords: mkesdp, ITDesk, service desk, SDP, open requests, request status, ticket, ai-memory tracking.'
+description: 'City of Milwaukee IT service desk at mkesdp.milwaukee.gov (Zoho ServiceDesk Plus On-Demand, ITHelp app). Use to check the signed-in user''s open or closed mkesdp requests in a browser, read request status from list rows, sign in through Microsoft SSO, map "mkesdp #NNNNN" references in TFS work items to requests, and track each request and its progress in ai-memory working checkpoints. Keywords: mkesdp, ITHelp, service desk, SDP, open requests, request status, ticket, ai-memory tracking.'
 ---
 
 # mkesdp IT service desk
@@ -33,7 +33,7 @@ a browser. Do not change existing requests unless the user asks for that exact a
 
 **Use this skill instead of nearby skills when:**
 
-- The task needs the City ITDesk web app at `mkesdp.milwaukee.gov`.
+- The task needs the City ITHelp web app at `mkesdp.milwaukee.gov`.
 
 **Do not use this skill when:**
 
@@ -100,8 +100,52 @@ but are never saved to skills or memory.
   Name, Work Phone, Category, Subject, Description. Urgency keeps its default
   unless the user names one.
 - **Request Type** options: Incident Report (default), Security Incident, Service Requests.
-- **Group** options include Database Administration. **Category** options include
-  Database. Pick the values the user names; ask if none are given.
+- **Category** (Select2 dropdown, click the "-- Select Category --" span, then the option)
+  options include Database, GIS, Applications, Server, Network Drives, User Administration,
+  and about 50 others. Use GIS for GIS data work. Pick the values the user names; ask if none are given.
+- **Group** options include Applications, Database Administration, GIS, Enterprise Systems,
+  Server Support, and IT Support. Use GIS for GIS work and Database Administration for database
+  changes. The Group list only fills after Category is set, so set Category first.
+- **Ticket lookup:** TFS (`tfs.milwaukee.gov`) is not reachable from this machine. Find the
+  original work in mkesdp instead. My Open Requests shows only open items, so closed tickets need
+  Requests Opened By Me (switch with the view dropdown on the list header). Open the request's
+  details page and check the Conversations tab (`details?selectTab=conversationsDetails`)
+  to read the thread. The URL uses the internal ID (for example `162131000066991117`), not
+  the display number.
+- **Browser sessions:** if VS Code restarts or freezes, the browser page is closed and the
+  partly filled form is lost. Reopen the form and refill it. Nothing is saved until Add Request.
+- **Browser tool hygiene (learned 2026-10-28):** Never call `stop_powershell` on a
+  browser run; it only stops shell processes and the page can be lost. Avoid scanning every
+  frame with `page.frames()` and `evaluate`, because it can hang. Read the form directly with
+  `page.getByRole`/`page.locator` instead. If `openBrowserPage` times out, check the returned
+  page ID with a short `runPlaywrightCode` call before retrying. Keep the viewport at
+  1600x1000 so the Select2 options render. Refill the form in one pass after a reopen.
+- **Work in a page Kevin can see (learned 2026-10-28).** Kevin must be able to watch the
+  form. If a page is listed as "(not visible)" in the Browser Pages attachment, do not keep
+  driving it. Ask Kevin to share the page or open a fresh one with
+  `openBrowserPage` using `forceNew: true`, and only work on a page marked "(active)".
+  Opening a new page discards the earlier draft, so refill it in one pass and read back every
+  field before submitting. Also, the new page may load in a mobile layout (about 375px wide).
+  Call `page.setViewportSize({width:1600,height:1000})` before filling. A `browserRefresh`
+  overlay ("refresh the page") appears after a size change. Click its refresh action (or
+  reload) and then refill, rather than working around it. Do not treat the form reset as a
+  failure.
+- **Always fill the email for Kevin (learned 2026-10-28).** Kevin's address is
+  kbaas@milwaukee.gov. The form has a "Work Email" field (`udf_fields-udf_char8`) and an
+  "Emails to Notify" field. Fill both with his address before submitting, and read them back.
+  Do not submit a request with either one empty.
+- **Editing a submitted request (learned 2026-10-28).** Open the details page and click
+  "Edit." The form's submit button is "Update Request" at the bottom of the form, not "Save."
+  The top-nav "Save" button (`#savepersonalize`) is unrelated. Scroll down and click
+  "Update Request," then confirm the "Request updated" message and reopen the details page.
+- **Write the description for the assignee, not for Kevin (learned 2026-10-28).** The assignee
+  may not see the original email or thread. Put the concrete work in the description: the exact
+  field and table names, and the action. Do not add research steps for the assignee unless Kevin
+  asks for them. Name the fields from the database or ai-memory before submitting.
+- **Description editor does not sync (2026-10-28).** The Description iframe (`about:srcdoc`)
+  holds the text, but the hidden `textarea[name=description]` stays empty and Add Request
+  reports "Provide value for field Description." Typing, Tab, and mouse clicks did not fix it.
+  Stop and ask Kevin before trying more workarounds.
 - **Subject** is prefilled with "General Incident -- Please update this Subject line --".
   Replace the whole text with the user's subject.
 - **Requester Name** is a typeahead with a search dialog. Searching for a person
@@ -232,7 +276,7 @@ for format details.
   (`<number>` is the display number, such as `66537`). Put the checkpoint in it as
   `itdesk-<number>-<kebab-subject>.md`. Put query exports or other output in an optional
   `output\` subfolder (for example `working\mkesdp-tickets\66537\output\`). Don't put
-  ITDesk checkpoints in project `tasks\` folders.
+  ITHelp checkpoints in project `tasks\` folders.
 - **Project:** the project the request concerns, such as `enotify-suite` for E-Notify
   issues or `outlook-inbox` for Accela, DPW, and general application support. If it's
   unclear, check [projects/PROJECTS.md](C:/Users/kbaas/git/ai-memory/projects/PROJECTS.md)
@@ -318,4 +362,4 @@ for format details.
   when a request concerns an Accela integration.
 - Request tracking index (open the first, then only the checkpoints you need):
   [WORKING.md](C:/Users/kbaas/git/ai-memory/working/WORKING.md). Open it when tracking
-  or reporting on requests. Existing ITDesk checkpoints are listed there by request number.
+  or reporting on requests. Existing ITHelp checkpoints are listed there by request number.

@@ -29,7 +29,7 @@ manual-system-actions doc once analysis is complete, but starts life as this scr
 
 Before diving into DB research, create (or confirm there already is) a TFS work item that
 represents fleshing this spec out into concrete action items — using
-[`../../../development-tools/tfs-boards/SKILL.md`](../../../development-tools/tfs-boards/SKILL.md).
+[`../../../internal-systems/tfs-boards/SKILL.md`](../../../internal-systems/tfs-boards/SKILL.md).
 This tracks analysis/planning before an implementation plan exists. A title such
 as "Analyze <spec name> and produce implementation plan" is enough; create the
 separate execution cards in Step 10 once the plan is known.
@@ -150,7 +150,7 @@ For every piece of the normalized behavior, classify it:
   question about what the business actually wants. Keep this list separate from the two above:
   those are things *the user* (as developer/admin) can decide; these need to go back to whoever
   wrote the spec. Typical examples: an ambiguous reference date ("within 7 days of *what* event,
-  using [`../../../development-tools/tfs-boards/SKILL.md`](../../../development-tools/tfs-boards/SKILL.md).
+  using [`../../../internal-systems/tfs-boards/SKILL.md`](../../../internal-systems/tfs-boards/SKILL.md).
   that could plausibly mean two different things operationally. Don't guess and don't silently pick
   one — list the question plainly, e.g. `local-notes/<project>/questions-for-requestor.md`, so the
   user can forward it as-is.
@@ -289,7 +289,7 @@ than importing it by default.
 ## Step 10 — Create TFS Work Items for the Major Steps
 
 Before starting the actual work (script edits, asking the user to make Admin changes), turn the
-implementation plan's phases into TFS cards, using [`../../../development-tools/tfs-boards/SKILL.md`](../../../development-tools/tfs-boards/SKILL.md).
+implementation plan's phases into TFS cards, using [`../../../internal-systems/tfs-boards/SKILL.md`](../../../internal-systems/tfs-boards/SKILL.md).
 Do this once the plan is written (Step 7), not after work is already done — the point is to track
 progress on the board as you go, not to log it retroactively.
 
@@ -326,9 +326,9 @@ progress on the board as you go, not to log it retroactively.
 Update phase status (`NOT STARTED` / `COMPLETED (date)`) as work progresses, the same way the
 construction-material implementation plan tracks it — this lets you or the user resume mid-task
 without re-deriving what's done. If the work is tracked on the TFS board, mirror status there too
-(move the card, add a comment) per [`../../../development-tools/tfs-boards/SKILL.md`](../../../development-tools/tfs-boards/SKILL.md) —
+(move the card, add a comment) per [`../../../internal-systems/tfs-boards/SKILL.md`](../../../internal-systems/tfs-boards/SKILL.md) —
 don't let the doc and the board drift out of sync.
-  per [`../../../development-tools/tfs-boards/SKILL.md`](../../../development-tools/tfs-boards/SKILL.md) —
+  per [`../../../internal-systems/tfs-boards/SKILL.md`](../../../internal-systems/tfs-boards/SKILL.md) —
 ## Step 11 — Feed Discoveries Back Into the Skill
 
 Before considering the task done, check whether anything from Steps 2-8 is worth writing into the

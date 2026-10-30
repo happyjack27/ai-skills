@@ -82,6 +82,8 @@ The essentials:
 | Production SQL Server | `sql-dpw3` — **not** sysadmin, **no Oracle provider** |
 | Oracle source | 19c, database `DPWP`, all objects owned by schema `DPW` |
 | Linked server | `DPWP` on `sql-treas` only — always via `OPENQUERY` |
+| Direct Oracle reads | **Check the `dpwp` connection in the SQL Developer VS Code extension first** (user-confirmed; no credentials stored). `sql-treas` `OPENQUERY(DPWP, ...)` via .NET `SqlClient` + integrated auth is the fallback that works from the shell. |
+| CityTime Oracle tables | Live in schemas `TANDL` (e.g. `TANDL.DTICKET`) and `HIST`, not `DPW`; qualify the owner and use `select t.*` for columns with `#` (e.g. `EMPL_RCD#`) |
 | Bookkeeping | `DatabaseMigration` DB, schema `migration` (lowercase) |
 | Oracle freeze schema | `MIGRATIONS` (uppercase, plural) |
 

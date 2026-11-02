@@ -2,6 +2,7 @@
 
 | Skill | Use when | Do not choose for |
 |---|---|---|
+| [`enotify-send`](enotify-send/SKILL.md) | Preparing and sending a manual legacy E-Notify (itmdapps.milwaukee.gov/Enotify/admin): send rights in Oracle EUSER_INFO, last-send lookup, form fill with image and PDF, creator test and header check | Building E-Notify code, EnotifyAdmin (AD) permission changes, or sending to subscribers without explicit approval |
 | [`itmdpedia`](itmdpedia/SKILL.md) | Finding and reading pages in the ITMD knowledge base on SharePoint (milw.sharepoint.com/sites/ITMDPedia): sign-in, Wiki Categories, title and full-text search, page bodies | Editing wiki pages, copying secrets from pages, or Accela configuration work |
 | [`mkesdp-servicedesk`](mkesdp-servicedesk/SKILL.md) | Checking the user's City IT service desk requests at mkesdp.milwaukee.gov (ITHelp, Zoho SDP) in a browser: open or closed status, list views, Microsoft sign-in, and mapping `mkesdp #NNNNN` numbers from TFS items | Creating, editing, assigning, or closing requests; storing requester data or ticket text in memory |
 | [`outlook-email`](outlook-email/SKILL.md) | Reading, searching, marking read/unread, flagging for follow-up, drafting, replying to, or sending Outlook email through classic Outlook COM or authorized Microsoft Graph | Outlook calendar, contacts, Exchange administration, or Outlook add-in development |

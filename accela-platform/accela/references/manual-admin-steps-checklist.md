@@ -56,6 +56,14 @@ something you can just look up.
 - Does the ASI group (`R3APPTYP.R1_SMARTCHOICE_CODE`) already contain every field the spec
   references (`SMARTCHOICE.BLOCK_NAME`)? A missing field is an Admin addition, and if it needs a
   picklist, its options (`SMARTCHOICE_OPTION`) are configured there too.
+- Classic Admin path for a record type's custom fields group: Application > Custom Fields
+  (`R2ChckBoxSearchV30`), search by Group Code, then open the group (`R2ChckBoxGroupEditV30`).
+  A subgroup such as `ASSESS SCRIPT` is a subgroup of that group, not a separate group.
+- To copy a subgroup from another group: on the group edit page, click "Add existing Custom
+  Fields Subgroup". The picker is a popup (`R2ChckBoxGroupAddV30`). Choose the source group
+  code and subgroup, then click the Add image (`/images/addbtn.gif`). The popup closes after
+  a successful add. Verify on the group page and in the subgroup edit page
+  (`R2ChckBoxEditV30`). Confirm the source fields first.
 
 ## 5. Fee Items
 

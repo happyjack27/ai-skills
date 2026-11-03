@@ -173,6 +173,31 @@ full checklist and how to verify each one via SQL before asking the user to act.
 - New workflow task existence in the process template (adding a task/step is Admin-only).
 - ASI (SmartChoice) group/field existence if the spec references a new custom field.
 
+### Custom field group vs. subgroup (production Admin, learned 2026-11-03)
+
+- A record type's **Custom Fields Group** (for example `BLD_OCC_TMP2`, `PW_SAN_CARTS`, `PW_FOR_COMP`) is
+  a separate object from the **Subgroups** inside it (for example `APPLICATION INFORMATION`, `PERMIT_TRACK`,
+  `TEMPORARY INFORMATION`, `ASSESS SCRIPT`). `ASSESS SCRIPT` is a **subgroup**, not a group.
+- The `PW_COMP` shown under a record type's "Associated Record Types" is not its custom field group.
+  Do not use `PW_COMP` as the custom field group.
+- Find the group on the record type: new admin (`#/main/recordtypes`) > Record Type > Other Associations >
+  Custom Fields Group. Then open the group's View / Edit (`#/main/application/customfields/edit/<GROUP>`)
+  to see its Subgroups.
+- Viewing a group is read-only. Do not change its dropdowns (for example Custom Lists Group) or click
+  Save unless the user has approved the exact change.
+
+### Accela browser navigation
+
+- Do not click a module's "New Record Type" button while browsing the record type list. It opens a
+  create dialog. Expand the module chevron instead.
+- Accela's header and left navigation can overlay buttons, so a normal click times out. Use a
+  DOM click only for view-only controls, and confirm the result with a page read.
+
+### Working rules
+
+- Make only the edits the user asked for. Do not write notes or other changes to ticket files, skills, or
+  Accela unless asked.
+
 ## Keep This Skill Current
 
 Record-type spec work regularly turns up things worth writing down for next time — do this before

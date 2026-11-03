@@ -7,7 +7,7 @@
 | `dpw-migration` | DPW Oracle-to-SQL Server migration and production cutover | [Skills](dpw-migration/SKILLS.md) |
 | `kwat-webapps` | KWAT web application services, UI metadata, and dynamic tables | [Skills](kwat-webapps/SKILLS.md) |
 | `development-tools` | SQL, Java, Excel, and web application documentation | [Skills](development-tools/SKILLS.md) |
-| `internal-systems` | City internal portals and systems: TFS boards, Outlook, mkesdp service desk, and ITMDPedia | [Skills](internal-systems/SKILLS.md) |
+| `internal-systems` | City internal portals and systems: TFS boards, Outlook, mkesdp service desk, ITMDPedia, the developer and end-user documentation sites, and personal CityTime time-entry checks | [Skills](internal-systems/SKILLS.md) |
 | `skill-authoring` | Creating and maintaining this skill library | [Skills](skill-authoring/SKILLS.md) |
 | `shared` | Cross-cutting shared skills and guidance | [Skills](shared/SKILLS.md) |
 

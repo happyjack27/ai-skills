@@ -2,6 +2,8 @@
 
 | Skill | Use when | Do not choose for |
 |---|---|---|
+| [`citytime-time-entry-check`](citytime-time-entry-check/SKILL.md) | Checking that your own CityTime time tickets (`TANDL.DTICKET`, DPWP Oracle) are entered for a pay period; read-only | Entering, editing, approving, or deleting time; Workday/CityTime integration work |
+| [`docs-sites`](docs-sites/SKILL.md) | Adding or updating pages on the DeveloperDocumentation and EndUserDocumentation Markdown sites: choosing the site, pulling the share copy, authoring in the local project, validating, publishing to `\\MkeAppsFs\FS\Apps\<Site>`, updating the index | Reading ITMDPedia, changing the viewer's Java/JSP code, or producing schema/use-case content (use `webapp-docs`) |
 | [`enotify-send`](enotify-send/SKILL.md) | Preparing and sending a manual legacy E-Notify (itmdapps.milwaukee.gov/Enotify/admin): send rights in Oracle EUSER_INFO, last-send lookup, form fill with image and PDF, creator test and header check | Building E-Notify code, EnotifyAdmin (AD) permission changes, or sending to subscribers without explicit approval |
 | [`itmdpedia`](itmdpedia/SKILL.md) | Finding and reading pages in the ITMD knowledge base on SharePoint (milw.sharepoint.com/sites/ITMDPedia): sign-in, Wiki Categories, title and full-text search, page bodies | Editing wiki pages, copying secrets from pages, or Accela configuration work |
 | [`mkesdp-servicedesk`](mkesdp-servicedesk/SKILL.md) | Checking the user's City IT service desk requests at mkesdp.milwaukee.gov (ITHelp, Zoho SDP) in a browser: open or closed status, list views, Microsoft sign-in, and mapping `mkesdp #NNNNN` numbers from TFS items | Creating, editing, assigning, or closing requests; storing requester data or ticket text in memory |

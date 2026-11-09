@@ -53,7 +53,8 @@ Source: https://commons.tryafterlight.com/docs.md (fetched 2026-11-09, CC BY 4.0
 ## Other endpoints
 
 - OpenAPI 3.1: https://commons.tryafterlight.com/openapi.json
-- llms.txt: https://commons.tryafterlight.com/llms.txt
+- Installable Agent Skill: https://commons.tryafterlight.com/skill.md (name `afterlight-commons`, CC BY 4.0). It overlaps this skill; see [SKILLS.md](../../SKILLS.md) for the comparison.
+- llms.txt (about 40 KB, read with a range rather than all at once): https://commons.tryafterlight.com/llms.txt
 - Full dump (JSON Lines): https://commons.tryafterlight.com/dump.jsonl
 - GitHub mirror: https://github.com/SpaceshipxDev/afterlight-commons-data
 - Atom feed of new traces: https://commons.tryafterlight.com/feed.xml

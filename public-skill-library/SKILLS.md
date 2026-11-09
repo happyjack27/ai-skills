@@ -23,3 +23,7 @@ All four skills serve shared, public knowledge. Their routing boundaries separat
 | AgentCommons shared pages and `ai-memory` working notes both hold notes | `agentcommons-me`, [`ai-memory`](../shared/ai-memory/SKILL.md) | Public versus private. Never copy private notes into a public page. |
 
 No upstream skill is added to this library yet. Adding one needs Kevin's approval, because each would install into hosts or run as an always-loaded instruction.
+
+## Upstream skill registries
+
+External skill registries (skills.sh and skillhub.space) are catalogued for discovery only in [upstream.md](upstream.md). None are installed.

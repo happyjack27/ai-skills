@@ -79,8 +79,22 @@ dropdown category.
 
 ## APP_SIDEBAR
 
-Stores application navigation items: `ItemID`, `ApplicationID`, `MenuText`, `TargetTable`,
-`DisplayOrder`, `ParentItemID`, `IconClass`, `RequiredRole`, and `Active`.
+Live columns (verified in KWATControl): `ID` (identity, do not insert), `APP_NAME`, `MENU_PARENT`,
+`DISPLAY_ORDER`, `LABEL`, `LABEL_STYLE`, `ICON`, `ICON_STYLE`, `URL`, `DIV`, `RELOAD`, `ACTION`,
+`TABLE_NAME`. Older names such as `ItemID`, `ApplicationID`, `MenuText`, `ParentItemID`, and
+`IconClass` do not exist.
+
+**Hierarchy (three levels, enforced by KWATClient `Sidebar2.js`):**
+- Top level: `MENU_PARENT` empty. Renders as a non-clickable heading (`<H3>`). Its `URL` is ignored.
+- Second level: `MENU_PARENT` = the parent row's `LABEL` (a label, not an ID). Clickable when it has no children.
+- Third level: `MENU_PARENT` = a second-level `LABEL`. Always clickable.
+
+`CoreServices3.controlGetSidebar` attaches children to parents by `LABEL`, then orders by
+`DISPLAY_ORDER ASC, MENU_PARENT, LABEL`. Negative `DISPLAY_ORDER` values sort first and are allowed.
+A row whose `MENU_PARENT` matches no visible label is dropped. Access is filtered through
+`APP_ACCESS_FILTERS` by `LABEL`. URLs beginning with `kwat/` are rewritten to KWATClient pagelets.
+
+A clickable item must be a child of a heading. Never put a link in a top-level row.
 
 ## Related Configuration Tables
 

@@ -95,6 +95,7 @@ This skill documents what to change; source code determines how the application 
 - Use semantic types such as `email`, `phone`, `address google`, `date`, and `textarea` when supported.
 - For file attachments, use `FK_ID` data type `attachments` and verify the parent-key mapping.
 - Test in non-production first, document the reason, and verify the UI after every change.
+- Sidebar items: only children under a heading are clickable. Never put a link in a top-level (`MENU_PARENT` empty) row. Verify by clicking the item in the browser and confirming its content loads; a blank panel is a failure.
 - Check dependent dropdowns, grants, caches, and generated CRUD procedures before finalizing.
 
 ## Validation Checklist

@@ -138,10 +138,11 @@ VALUES
 
 ## Update Sidebar Navigation
 
-1. Resolve the application ID.
-2. Choose a non-conflicting `DisplayOrder` and set `ParentItemID` when adding a submenu.
-3. Insert the item with its target table or URL, icon, role, and active state.
-4. Query the complete application menu ordered by `DisplayOrder` and test navigation.
+1. Read the existing rows: `SELECT ID, MENU_PARENT, DISPLAY_ORDER, LABEL, URL FROM APP_SIDEBAR WHERE APP_NAME = '<App>' ORDER BY DISPLAY_ORDER, MENU_PARENT, LABEL`.
+2. Decide the depth. A clickable item must be a child: set `MENU_PARENT` to an existing heading's exact `LABEL`. Do not put a link in a top-level row, because top-level rows are headings only.
+3. Insert without `ID` (identity). Set `APP_NAME`, `LABEL`, `MENU_PARENT`, `URL`, `ICON`, `DISPLAY_ORDER`, and `ACTION`.
+4. Do not renumber existing rows unless asked. `DISPLAY_ORDER` does not need to be sequential; it sorts ascending.
+5. Confirm the URL resolves (200 and the expected page, not a login or unrelated page). Then open the app's menu in a browser, click the item, and confirm content loads. A blank panel means the URL is wrong or the page is not deployed.
 
 ## Configure Form Layout
 

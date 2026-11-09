@@ -14,7 +14,7 @@
 | APP_DROPDOWNS | Lookup/dropdown values | ID, CATEGORY, KEY, VALUE |
 | APP_REPORTS | Report configurations | ReportID, ApplicationID, ReportName, DisplayName, ReportSQL |
 | APP_REPORT_PARAMS | Report filters/parameters | ParamID, ReportID, ParamName, DataType |
-| APP_SIDEBAR | Navigation menu items | ItemID, ApplicationID, MenuText, TargetTable, DisplayOrder |
+| APP_SIDEBAR | Navigation menu items (3-level tree by LABEL) | ID, APP_NAME, MENU_PARENT, LABEL, URL, DISPLAY_ORDER |
 | APP_GRANTS | Role-based access control | GrantID, RoleID, TableID, ColumnID, AllowRead, AllowCreate, AllowUpdate, AllowDelete |
 | APP_ENHANCEMENTS | UI customizations | EnhancementID, TableID, ColumnID, CustomCSS, CustomJS |
 | APP_ACCESS_FILTERS | Dynamic record-level access | FilterID, TableID, FilterSQL |
@@ -66,10 +66,10 @@ ORDER BY DisplayName;
 
 ### Get Sidebar Menu for an App
 ```sql
-SELECT ItemID, MenuText, TargetTable, DisplayOrder, IconClass, Active
+SELECT ID, MENU_PARENT, DISPLAY_ORDER, LABEL, URL, ICON, ACTION
 FROM dbo.APP_SIDEBAR
-WHERE ApplicationID = (SELECT ApplicationID FROM dbo.APP_APP_APP WHERE AppName = 'KWAT')
-ORDER BY DisplayOrder;
+WHERE APP_NAME = 'KWAT'
+ORDER BY DISPLAY_ORDER, MENU_PARENT, LABEL;
 ```
 
 ## Common Operations
@@ -108,10 +108,12 @@ INSERT INTO dbo.APP_REPORTS (ApplicationID, ReportName, DisplayName, ReportSQL, 
 VALUES (@ApplicationID, 'ReportName', 'Report Display Name', 'SELECT ... FROM ...', 1);
 ```
 
-### Add Sidebar Menu Item
+### Add Sidebar Menu Item (clickable child under a heading)
 ```sql
-INSERT INTO dbo.APP_SIDEBAR (ApplicationID, MenuText, TargetTable, DisplayOrder, IconClass, Active)
-VALUES (@ApplicationID, 'Menu Text', 'TableName', 1, 'fa-icon', 1);
+-- MENU_PARENT must be the exact LABEL of an existing top-level heading.
+-- Do not insert ID (identity column).
+INSERT INTO dbo.APP_SIDEBAR (APP_NAME, MENU_PARENT, LABEL, URL, ICON, DISPLAY_ORDER, ACTION)
+VALUES ('KWAT', 'Heading Label', 'Menu Text', 'kwat/pagelet/path', 'fa fa-icon', 10, 'Load once');
 ```
 
 ### Grant Access to a Role
@@ -128,7 +130,7 @@ VALUES (@RoleID, @TableID, 1, 1, 1, 1);
 - **VALUE (dropdown display label):** Use Title Case with spaces (Active, In Progress, Suspended)
 - **TableName / ColumnName:** Match underlying database table/column names exactly
 - **DisplayName:** Use Title Case with spaces for UI labels (Contractor ID, Project Name)
-- **MenuText (sidebar):** Use clear, user-friendly terms (Contractors, Projects, Reports)
+- **LABEL (sidebar):** Use clear, user-friendly terms (Contractors, Projects, Reports)
 
 ## Important Rules
 
@@ -137,7 +139,7 @@ VALUES (@RoleID, @TableID, 1, 1, 1, 1);
 3. **Always verify changes in the UI** after modifying KWATControl.
 4. **Never permanently DELETE** — use Active=0 or Visible=0 instead.
 5. **ColumnOrder must be sequential** within a TableID (1, 2, 3, ... not 1, 3, 5).
-6. **DisplayOrder must be sequential** within an ApplicationID for sidebars (1, 2, 3, ...).
+6. **Sidebar depth matters:** a top-level row (empty `MENU_PARENT`) is only a heading and is not clickable. Put clickable items under a heading, with `MENU_PARENT` = the heading's `LABEL`. `DISPLAY_ORDER` is sorted ascending, not required to be sequential.
 7. **DropdownSource CATEGORY must exist** in APP_DROPDOWNS before linking a column.
 8. **ApplicationID must exist** in APP_APP_APP before creating tables/reports/sidebars for it.
 
@@ -148,7 +150,9 @@ VALUES (@RoleID, @TableID, 1, 1, 1, 1);
 | Column not showing in UI | Visible=0 or Active=0 | `UPDATE ... SET Visible=1, Active=1 ...` |
 | Dropdown shows no values | DropdownSource CATEGORY doesn't exist or is misspelled | Check `SELECT DISTINCT CATEGORY FROM APP_DROPDOWNS` |
 | Wrong columns showing | ColumnOrder is not sequential or is negative | Fix ColumnOrder to be 1, 2, 3, ... |
-| Sidebar menu not appearing | Active=0 or wrong ApplicationID | Check `SELECT * FROM APP_SIDEBAR WHERE ApplicationID = @AppID` |
+| Sidebar menu not appearing | Active=0 or wrong APP_NAME, or MENU_PARENT matches no existing LABEL | Check `SELECT * FROM APP_SIDEBAR WHERE APP_NAME = 'KWAT'` |
+| Sidebar item not clickable | It's a top-level heading (empty MENU_PARENT) | Set MENU_PARENT to a heading's LABEL |
+| Sidebar item loads blank | URL wrong, not deployed, or the URL returns a different page | curl the URL and confirm the expected content |
 | Report SQL fails | Invalid table/column names or wrong syntax | Test the ReportSQL in SQL Server first |
 | Access denied for users | Grants not set or RoleID mismatch | Verify grants exist for user's RoleID |
 

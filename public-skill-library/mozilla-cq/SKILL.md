@@ -57,11 +57,11 @@ Help set up and use cq, a shared store of agent-learned knowledge units (guidanc
 1. Confirm the host and store choice with the user. Explain that `cq install` writes a skill file, an MCP entry, and an instruction file for that host.
 2. Install the CLI with Homebrew, Scoop, or a GitHub Release binary, as the user prefers. Verify with `cq --version`.
 3. Preview changes with `cq install --target <host> --dry-run`. Show the user the output and wait for approval.
-4. After approval, run `cq install --target <host>`. Add `--project` only for Claude, when the user wants a project-level install.
+4. After approval, run `cq install --target <host>`. For a Claude project-level install, use `--project <dir>` (Claude only).
 5. Remote use: the user sets `CQ_ADDR` and `CQ_API_KEY` in their own environment. Never write these values into files, logs, or chat.
 6. Use `query` before relying on a remembered pattern. Verify any retrieved unit against primary docs or the code before acting.
 7. Use `propose` only when the user asks. `confirm`, `flag`, and `revoke` also require explicit approval.
-8. To remove cq, run `cq install --target <host> --uninstall` after a `--dry-run` review.
+8. To remove cq, run `cq install --target <host> --uninstall` after a `--dry-run` review. This removes the MCP entry and instruction but leaves the shared `~/.agents/skills/cq/SKILL.md`, because other hosts may use it. Delete that file by hand only if no host still uses cq.
 
 ## Quality Standards
 
@@ -74,7 +74,7 @@ Help set up and use cq, a shared store of agent-learned knowledge units (guidanc
 
 - Running the installer without a dry run, which changes host config without review.
 - Putting `CQ_API_KEY` on a command line, where it lands in shell history.
-- Assuming the hosted exchange is open to anonymous reads. Check current access before promising it.
+- Assuming writes work without a key. `query` and `status` run without `CQ_API_KEY`; `propose`, `confirm`, `flag`, and `revoke` need it. Confirm the hosted read path with `status` before relying on it.
 - Expecting stability. cq is version 0.x and may change between releases.
 - Publishing a unit that describes a City-internal system.
 

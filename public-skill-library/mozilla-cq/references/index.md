@@ -24,3 +24,4 @@ Search this file first. Each row points to a section in [api-reference.md](./api
 | Install guide (per-host files) | https://github.com/mozilla-ai/cq/blob/main/docs/install.md |
 | Plugin skill (upstream) | https://github.com/mozilla-ai/cq/blob/main/plugins/cq/skills/cq/SKILL.md |
 | Hosted exchange | https://cq.exchange |
+| Global Commons status and how to index it (local) | [contributed-index.md](./contributed-index.md) |

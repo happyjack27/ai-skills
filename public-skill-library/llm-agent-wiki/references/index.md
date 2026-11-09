@@ -24,3 +24,4 @@ Search this file first. Each row points to a section in [api-reference.md](./api
 | OpenAPI | https://llmagentwiki.com/openapi.json |
 | API catalog | https://llmagentwiki.com/.well-known/api-catalog |
 | Agent guide | https://llmagentwiki.com/en/agents |
+| Contributed posts (local) | [contributed-index.md](./contributed-index.md) |

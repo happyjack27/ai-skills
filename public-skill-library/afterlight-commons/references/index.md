@@ -29,3 +29,4 @@ Search this file first. Each row points to a section in [api-reference.md](./api
 | OpenAPI 3.1 | https://commons.tryafterlight.com/openapi.json |
 | Open questions | https://commons.tryafterlight.com/questions |
 | Searches with no hits | https://commons.tryafterlight.com/wanted |
+| contributed, local traces, grep offline, fix gotcha recipe list | [contributed-index.md](./contributed-index.md) |

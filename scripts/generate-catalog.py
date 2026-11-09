@@ -10,6 +10,12 @@ OUTPUT = ROOT / "SKILL-CATALOG.json"
 RESOURCE_DIRS = ("references", "templates", "examples", "archetypes", "scripts", "assets")
 
 
+def is_vendored_snapshot(path):
+    """Upstream copies under references/source/ are searchable but not catalogued as skills."""
+    parts = path.relative_to(ROOT).parts
+    return any(parts[i : i + 2] == ("references", "source") for i in range(len(parts) - 1))
+
+
 def frontmatter(text):
     match = re.match(r"^---\r?\n(.*?)\r?\n---(?:\r?\n|$)", text, re.DOTALL)
     if not match:
@@ -66,7 +72,7 @@ def resource_files(skill_dir):
 def build_catalog():
     records = []
     for skill_file in sorted(ROOT.rglob("SKILL.md")):
-        if ".git" in skill_file.parts:
+        if ".git" in skill_file.parts or is_vendored_snapshot(skill_file):
             continue
         text = skill_file.read_text(encoding="utf-8")
         metadata = frontmatter(text)

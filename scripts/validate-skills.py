@@ -22,6 +22,12 @@ def frontmatter(text):
     return values
 
 
+def is_vendored_snapshot(path):
+    """Upstream copies under references/source/ are searchable but not validated as skills."""
+    parts = path.relative_to(ROOT).parts
+    return any(parts[i : i + 2] == ("references", "source") for i in range(len(parts) - 1))
+
+
 def local_links(markdown_file):
     text = markdown_file.read_text(encoding="utf-8")
     text = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
@@ -39,7 +45,7 @@ def local_links(markdown_file):
 
 def main():
     errors = []
-    skills = sorted(ROOT.rglob("SKILL.md"))
+    skills = sorted(f for f in ROOT.rglob("SKILL.md") if not is_vendored_snapshot(f))
     skill_records = {}
 
     for skill_file in skills:
@@ -66,7 +72,7 @@ def main():
             errors.append(f"{relative}: missing from {index.relative_to(ROOT).as_posix()}")
 
     for markdown_file in ROOT.rglob("*.md"):
-        if ".git" in markdown_file.parts:
+        if ".git" in markdown_file.parts or is_vendored_snapshot(markdown_file):
             continue
         for link in local_links(markdown_file):
             if not link.exists():

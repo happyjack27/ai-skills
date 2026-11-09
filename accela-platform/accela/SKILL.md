@@ -190,6 +190,43 @@ full checklist and how to verify each one via SQL before asking the user to act.
 
 - Do not click a module's "New Record Type" button while browsing the record type list. It opens a
   create dialog. Expand the module chevron instead.
+- Finding which workflow each record type uses (read-only, learned 2026-11-04): open Administration >
+  Record Type Definition. Type the group name (for example `Sanitation`) in the group's "Find in list"
+  box to filter rows. Columns are Record Type Alias, Record Type, Fee Schedule, Workflow, Intake Form
+  Configuration, Custom Fields Group. The workflow is the fourth code in each row. Rows with fee
+  schedule NONE have one fewer code, so count from the right if needed. Re-read the page before each
+  click because the grid re-renders, and close any "New Record Type" panel with its X without saving.
+  Record the results in ai-memory `projects/accela-scripts/sanitation-enforcement-workflows.md`.
+- Workflow Designer (learned 2026-11-04). Working route: open the standalone page
+  `https://milwaukee-prod-av.accela.com/portlets/commons/workflowdesigner/workflowdesigner.jsp` directly.
+  Dead ends: the admin tree label only expands, the legacy `flowDiagramSetup.do` route is a blank error
+  iframe, and dashboard search returns nothing for "workflow designer".
+  - Open: toolbar Open, filter by exact workflow name, click the row, then Open. Read the tab title
+    (`.x-tab-strip-text`) to confirm which workflow is open.
+  - Read-only checks are safe. Only Save, Save Draft, and Clone change anything. Clone is at the top
+    toolbar and is easy to hit by mistake. Never click Save, Save Draft, or Clone without Kevin's
+    approval of the exact diagram.
+  - Layout: the canvas is wide, and placement fails at the default size. Run
+    `page.setViewportSize({width: 1674, height: 900})` before editing. Then the palette Task item is at
+    about (42,189) and the Straight tool at about (48,98), but confirm with a DOM check.
+  - Place a Task: arm the palette Task item, then click an empty canvas spot. A new "Task5" appears
+    selected. Rename it in Task Properties: click the Task Name value once, press Ctrl+A, type the name,
+    then press Enter. Verify with a DOM text search and a fresh screenshot, because screenshots can lag
+    a step behind the DOM.
+  - Verified 2026-11-04: the canvas is SVG (no canvas element). Node rects are the `rect` elements in
+    `svg`, for example Payment at (852,605) 72x32 at 1674x900. Hovering a node turns its outline green.
+    Hovering the right-edge midpoint shows no connection handle. Do not press the mouse to test handles.
+  - Do NOT use the toolbar New button to make a scratch diagram. It opens "Create Workflow", and Submit
+    creates a real workflow in production. On 2026-11-04 the first Cancel click missed because a hidden
+    duplicate Cancel matched. Click the visible Cancel inside the dialog and confirm it closed.
+  - Do NOT drag from a task box to draw a connector. On 2026-11-04 this moved the Payment task twice
+    and never drew a link, and clicking Straight then clicking two boxes also drew nothing. Connector
+    drawing is still unsolved. Ask Kevin to draw connectors, or confirm a method on a scratch workflow
+    first.
+  - Undo does not reliably reverse a move. Reloading discards unsaved edits, and the page then stays
+    empty until you reopen the workflow. Accept the beforeunload prompt only when the edits are unwanted.
+  - Stop and report to Kevin after the first unexpected change. Do not keep retrying drags on a
+    production diagram.
 - Accela's header and left navigation can overlay buttons, so a normal click times out. Use a
   DOM click only for view-only controls, and confirm the result with a page read.
 

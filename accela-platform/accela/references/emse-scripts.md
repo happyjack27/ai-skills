@@ -110,6 +110,18 @@ production DPW work orders. Verify endpoint and environment separately for AATES
 
 ## Config JSON Files
 
+### Event script deploy via EMSE Tool, worked 2026-11-03 (IRSA;ENFORCEMENT!~!~!~.js)
+
+- Use a light browser page, not one with many open record tabs; a page loaded with record tabs never
+  rendered the EMSE Tool frame. Launchpad (grid icon) > EMSE Tool; the content is in the frame
+  `emseTools.do?mode=list`. Root shown: `https://itmdgit.milwaukee.gov/accela/accela-scripts.git`.
+- Expand `Agency_scripts > Scripts > Event`, click the file name to open the comparison. The header
+  shows "Number of differences" and "Modified by <user> at <time>" for the SCCS and AA sides; expect the
+  AA side to be the previous commit. Check only that file's checkbox (confirm it is the only one
+  checked), click Deploy, accept "Are you sure you want to deploy this script?".
+- Success text names the EMSE script, for example `IRSA:ENFORCEMENT/*/*/*` for the file
+  `IRSA;ENFORCEMENT!~!~!~.js`. Reopen the file: "0 differences from 0 lines of code" is the readback proof.
+
 Several cross-cutting behaviors are driven by JSON config read by scripts, not hardcoded per
 record type — check these before assuming logic belongs in a `.js` file:
 
